@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using PasswordKeeper.DataAccess;
 
 namespace PasswordKeeperServer.Controllers;
 
@@ -12,7 +13,7 @@ namespace PasswordKeeperServer.Controllers;
 /// </summary>
 [ApiController]
 [Route("[controller]")]
-public class AuthenticationController : ControllerBase
+public class AuthenticationController(Users users) : ControllerBase
 {
     /// <summary>
     /// User login data.
@@ -30,8 +31,9 @@ public class AuthenticationController : ControllerBase
     [HttpPost(Name = "Login")]
     [Route("login")]
     [AllowAnonymous]
-    public IActionResult Login([FromBody] UserLogin user)
+    public async Task<IActionResult> Login([FromBody] UserLogin user)
     {
+        var userDto = await users.GetUserByName(user.Username);
         if (user.Username == "admin" && user.Password == "password")
         {
             var token = GenerateJwtToken(user.Username);
@@ -67,8 +69,8 @@ public class AuthenticationController : ControllerBase
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: "yourdomain.com",
-            audience: "yourdomain.com",
+            issuer: Program.PseudoDomain,
+            audience: Program.PseudoDomain,
             claims: claims,
             expires: DateTime.Now.AddMinutes(30),
             signingCredentials: credentials);

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MySql.Data.MySqlClient;
 using PasswordKeeper.DAO;
+using PasswordKeeper.DataAccess;
 
 namespace PasswordKeeperServer;
 
@@ -36,8 +37,8 @@ public static class Program
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = "yourdomain.com",
-                    ValidAudience = "yourdomain.com",
+                    ValidIssuer = Program.PseudoDomain,
+                    ValidAudience = Program.PseudoDomain,
                     IssuerSigningKey = new SymmetricSecurityKey(JwtKey),
                 };
             });
@@ -51,41 +52,44 @@ public static class Program
                 .Build();
         });
         
-        connectionString =
+        _connectionString =
             builder.Configuration.GetValue<string>("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         
         // Add the database context
-        builder.Services.AddDbContextFactory<Entities>(options => options.UseMySQL(connectionString));
+        builder.Services.AddDbContextFactory<Entities>(options => options.UseMySQL(_connectionString));
         
-        // Add services to the container.
+        builder.Services.AddSingleton<Users>();
+        
+        // Add services to the container
         builder.Services.AddControllers();
+
+        // Add automapper DI
+        builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
         
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
+        // Configure the HTTP request pipeline
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
         }
 
         app.UseHttpsRedirection();
-
         app.UseAuthentication();
         app.UseAuthorization();
-
-
         app.MapControllers();
-
         app.Run();
     }
 
-    private static string connectionString;
-    private static byte[]? jwtKey;
+    private static string? _connectionString;
+    private static byte[]? _jwtKey;
 
+    internal const string PseudoDomain = "password_keeper_server.com";
+    
     /// <summary>
     /// A property to get the JWT key. If the database is empty, a new random key is generated and stored there.
     /// </summary>
@@ -93,33 +97,38 @@ public static class Program
     {
         get
         {
-            if (jwtKey == null)
+            // If the key is already in memory, return it
+            if (_jwtKey == null)
             {
-                using var connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString);
+                // Check the database for the key
+                using var connection = new MySql.Data.MySqlClient.MySqlConnection(_connectionString);
                 connection.Open();
         
                 using var command = connection.CreateCommand();
         
-                command.CommandText = $"SELECT JwtSecurityKey FROM KeyData";
+                command.CommandText = @"SELECT JwtSecurityKey FROM KeyData";
                 var key = (string?)command.ExecuteScalar();
                 if (key != null)
                 {
-                    jwtKey = Convert.FromBase64String(key);
+                    // If the key is in the database, use it
+                    _jwtKey = Convert.FromBase64String(key);
                     connection.Close();
-                    return jwtKey;
+                    return _jwtKey;
                 }
                 
+                // If the key is not in the database, generate a new one
                 var randomBytes = new byte[32];
                 using var rng = RandomNumberGenerator.Create();
                 rng.GetBytes(randomBytes);
-                jwtKey = randomBytes;
+                _jwtKey = randomBytes;
 
+                // Store the key in the database
                 using var insertKeyCommand = connection.CreateCommand();
                 insertKeyCommand.CommandText = "INSERT INTO KeyData (JwtSecurityKey) VALUES (@key)";
                 insertKeyCommand.Parameters.Add(new MySqlParameter
                 {
                     ParameterName = "@key",
-                    Value = Convert.ToBase64String(jwtKey),
+                    Value = Convert.ToBase64String(_jwtKey),
                     MySqlDbType = MySqlDbType.Text,
                 });
                 
@@ -127,7 +136,8 @@ public static class Program
                 connection.Close();
             }    
             
-            return jwtKey;
+            // Return the key
+            return _jwtKey;
         }
     } 
 }

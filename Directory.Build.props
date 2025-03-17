@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
     <DocumentationComments>true</DocumentationComments>
-    <DocumentationFile>none</DocumentationFile>
+    <DocumentationFile></DocumentationFile>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
 </Project>
