@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <DocumentationComments>true</DocumentationComments>
+    <DocumentationFile>none</DocumentationFile>
+  </PropertyGroup>
+</Project>

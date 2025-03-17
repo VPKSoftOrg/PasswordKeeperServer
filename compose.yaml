@@ -1,0 +1,6 @@
+﻿services:
+  password-keeper-server:
+    image: password-keeper-server
+    build:
+      context: .
+      dockerfile: password-keeper-server/Dockerfile

@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PasswordKeeperServer</name>
+    </assembly>
+    <members>
+        <member name="T:PasswordKeeperServer.Controllers.AuthenticationController">
+            <summary>
+            The authentication controller.
+            </summary>
+        </member>
+        <member name="T:PasswordKeeperServer.Controllers.AuthenticationController.UserLogin">
+            <summary>
+            User login data.
+            </summary>
+            <param name="Username">The username for the login.</param>
+            <param name="Password">The password for the login.</param>
+        </member>
+        <member name="M:PasswordKeeperServer.Controllers.AuthenticationController.UserLogin.#ctor(System.String,System.String)">
+            <summary>
+            User login data.
+            </summary>
+            <param name="Username">The username for the login.</param>
+            <param name="Password">The password for the login.</param>
+        </member>
+        <member name="P:PasswordKeeperServer.Controllers.AuthenticationController.UserLogin.Username">
+            <summary>The username for the login.</summary>
+        </member>
+        <member name="P:PasswordKeeperServer.Controllers.AuthenticationController.UserLogin.Password">
+            <summary>The password for the login.</summary>
+        </member>
+        <member name="M:PasswordKeeperServer.Controllers.AuthenticationController.Login(PasswordKeeperServer.Controllers.AuthenticationController.UserLogin)">
+            <summary>
+            Logs the user in and returns a JWT token.
+            </summary>
+            <param name="user">The user login data.</param>
+            <returns>A JWT token if the login is valid, otherwise Unauthorized.</returns>
+        </member>
+        <member name="M:PasswordKeeperServer.Controllers.AuthenticationController.TestUnauthorized">
+            <summary>
+            An endpoint for testing unauthorized access.
+            </summary>
+            <returns>An Ok result if the request is authorized.</returns>
+        </member>
+        <member name="M:PasswordKeeperServer.Controllers.AuthenticationController.GenerateJwtToken(System.String)">
+            <summary>
+            Generates a JWT token for the given username.
+            </summary>
+            <param name="username">The username to generate the JWT token for.</param>
+            <returns>The JWT token.</returns>
+        </member>
+        <member name="T:PasswordKeeperServer.Program">
+            <summary>
+            The ASP.NET Core entry point.
+            </summary>
+        </member>
+        <member name="M:PasswordKeeperServer.Program.Main(System.String[])">
+            <summary>
+            The entry point for the ASP.NET Core application. Sets up the web host, configures authentication and authorization,
+            establishes the database context, and configures the HTTP request pipeline.
+            </summary>
+            <param name="args">Command line arguments.</param>
+        </member>
+        <member name="P:PasswordKeeperServer.Program.JwtKey">
+            <summary>
+            A property to get the JWT key. If the database is empty, a new random key is generated and stored there.
+            </summary>
+        </member>
+    </members>
+</doc>

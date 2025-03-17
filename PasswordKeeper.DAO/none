@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>PasswordKeeper.DAO</name>
+    </assembly>
+    <members>
+        <member name="T:PasswordKeeper.DAO.KeyData">
+            <summary>
+            
+            </summary>
+        </member>
+    </members>
+</doc>
