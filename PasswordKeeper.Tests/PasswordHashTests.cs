@@ -2,13 +2,27 @@ using PasswordKeeper.BusinessLogic;
 
 namespace PasswordKeeper.Tests;
 
-public class Tests
+/// <summary>
+/// Tests the password hashing and verification functionality.
+/// </summary>
+public class PasswordHashTests
 {
+    /// <summary>
+    /// Sets up the test environment before each test.
+    /// </summary>
     [SetUp]
     public void Setup()
     {
     }
 
+    /// <summary>
+    /// Tests the password hashing and verification functionality.
+    /// </summary>
+    /// <remarks>
+    /// Generates random passwords of varying lengths, hashes them, and verifies
+    /// that the hashed passwords match the original passwords using the generated salt.
+    /// The test is performed multiple times to ensure consistency and correctness.
+    /// </remarks>
     [Test]
     public void TestPasswordHash()
     {
