@@ -8,15 +8,20 @@ public interface IUser
     /// <summary>
     /// The unique identifier for the user.
     /// </summary>
-    public long Id { get; set; }
+    long Id { get; set; }
     
     /// <summary>
     /// The name of the user.
     /// </summary>
-    public string UserName { get; set; }
+    string UserName { get; set; }
     
     /// <summary>
     /// The password of the user.
     /// </summary>
-    public string Password { get; set; }
+    string PasswordHash { get; set; }
+    
+    /// <summary>
+    /// The salt of the user's password.
+    /// </summary>
+    string PasswordSalt { get; set; }
 }

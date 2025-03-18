@@ -1,0 +1,6 @@
+<Project>
+  <ItemGroup>
+    <Content Remove="**/none.ignore" />
+    <None Remove="**/none.ignore" />
+  </ItemGroup>
+</Project>

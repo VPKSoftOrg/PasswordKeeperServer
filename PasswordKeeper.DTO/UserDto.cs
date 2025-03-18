@@ -1,4 +1,5 @@
-﻿using PasswordKeeper.Interfaces;
+﻿using System.Text.Json.Serialization;
+using PasswordKeeper.Interfaces;
 
 namespace PasswordKeeper.DTO;
 
@@ -13,6 +14,11 @@ public class UserDto : IUser
     /// <inheritdoc cref="IUser.UserName" />
     public string UserName { get; set; } = string.Empty;
 
-    /// <inheritdoc cref="IUser.Password" />
-    public string Password { get; set; } = string.Empty;
+    /// <inheritdoc cref="IUser.PasswordHash" />
+    [JsonIgnore]
+    public string PasswordHash { get; set; } = string.Empty;
+
+    /// <inheritdoc cref="IUser.PasswordSalt" />
+    [JsonIgnore]
+    public string PasswordSalt { get; set; } = string.Empty;
 }

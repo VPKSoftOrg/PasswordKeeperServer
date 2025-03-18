@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <DocumentationComments>true</DocumentationComments>
-    <DocumentationFile></DocumentationFile>
+    <DocumentationFile>none.ignore</DocumentationFile>
     <LangVersion>default</LangVersion>
   </PropertyGroup>
 </Project>

@@ -16,6 +16,8 @@ internal static class Program
     static void Main(string[] args)
     {
         var connectionString = args[0];
+        
+        Console.WriteLine(connectionString);
 
         // Replace the database name to sys, that should always exist in a MariaDB server
         var connectionStringMaster = Regex.Replace(connectionString, "Database=.*?(;|$)", "database=sys;");

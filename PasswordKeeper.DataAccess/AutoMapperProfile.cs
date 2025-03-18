@@ -14,6 +14,7 @@ public class AutoMapperProfile : Profile
     /// </summary>
     public AutoMapperProfile()
     {
-        CreateMap<User, UserDto>().ReverseMap();
+        CreateMap<User, UserDto>();
+        CreateMap<UserDto, User>().ForMember(f => f.Id, o => o.Ignore());
     }
 }

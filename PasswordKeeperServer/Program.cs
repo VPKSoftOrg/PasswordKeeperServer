@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MySql.Data.MySqlClient;
+using PasswordKeeper.BusinessLogic;
 using PasswordKeeper.DAO;
 using PasswordKeeper.DataAccess;
 
@@ -58,8 +59,9 @@ public static class Program
         
         // Add the database context
         builder.Services.AddDbContextFactory<Entities>(options => options.UseMySQL(_connectionString));
-        
-        builder.Services.AddSingleton<Users>();
+
+        builder.Services.AddDataAccess();
+        builder.Services.AddBusinessLogic();
         
         // Add services to the container
         builder.Services.AddControllers();

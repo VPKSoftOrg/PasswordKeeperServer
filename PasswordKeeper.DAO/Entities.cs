@@ -25,5 +25,9 @@ public sealed class Entities : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<KeyData>().HasKey(f => f.Id);
+        modelBuilder.Entity<User>(f =>
+        {
+            f.HasKey(i => i.Id);
+        });
     }
 }

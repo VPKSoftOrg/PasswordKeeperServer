@@ -1,10 +1,10 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using PasswordKeeper.DataAccess;
+using PasswordKeeper.BusinessLogic;
+using PasswordKeeper.DTO;
 
 namespace PasswordKeeperServer.Controllers;
 
@@ -34,11 +34,36 @@ public class AuthenticationController(Users users) : ControllerBase
     public async Task<IActionResult> Login([FromBody] UserLogin user)
     {
         var userDto = await users.GetUserByName(user.Username);
-        if (user.Username == "admin" && user.Password == "password")
+        
+        // If the username is "admin" and the password is not empty, create a new user,
+        // this is the initial admin user.
+        if (user is { Username: "admin", Password.Length: > 0, } && userDto is null)
         {
+            byte []? salt = null;
+            userDto = new UserDto
+            {
+                UserName = user.Username,
+                PasswordHash = Users.HashPassword(user.Password, ref salt),
+                PasswordSalt = Convert.ToBase64String(salt!),
+            };
+
+            await users.UpsertUser(userDto);
+            
             var token = GenerateJwtToken(user.Username);
             return Ok(new { token, });
         }
+
+        // An existing user, verify the password
+        if (userDto is not null)
+        {
+            if (Users.VerifyPassword(user.Password, userDto.PasswordHash,
+                    Convert.FromBase64String(userDto.PasswordSalt)))
+            {
+                var token = GenerateJwtToken(user.Username);
+                return Ok(new { token, });
+            }
+        }
+
         return Unauthorized();
     }
     
