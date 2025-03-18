@@ -2,8 +2,15 @@
 
 namespace PasswordKeeper.DAO;
 
+/// <summary>
+/// The <c>Entities</c> class represents the root entity object for the database context.
+/// </summary>
 public sealed class Entities : DbContext
 {
+    /// <summary>
+    /// The <c>Entities</c> class represents the root entity object for the database context.
+    /// </summary>
+    /// <param name="options">The database context options.</param>
     public Entities(DbContextOptions<Entities> options) : base(options)
     {
         KeyData = Set<KeyData>();
