@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using MySql.Data.MySqlClient;
 using PasswordKeeper.BusinessLogic;
 using PasswordKeeper.DAO;
@@ -70,7 +71,11 @@ public static class Program
         builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
         
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-        builder.Services.AddOpenApi();
+        builder.Services.AddOpenApi("v3",options =>
+        {
+            options.ShouldInclude = operation => operation.HttpMethod != null;
+            options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_0;
+        });
 
         var app = builder.Build();
 

@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Authentication;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -47,9 +48,9 @@ public class AuthenticationController(Users users) : ControllerBase
                 PasswordSalt = Convert.ToBase64String(salt!),
             };
 
-            await users.UpsertUser(userDto);
+            userDto = await users.UpsertUser(userDto);
             
-            var token = GenerateJwtToken(user.Username);
+            var token = GenerateJwtToken(user.Username, userDto.Id);
             return Ok(new { token, });
         }
 
@@ -59,7 +60,7 @@ public class AuthenticationController(Users users) : ControllerBase
             if (Users.VerifyPassword(user.Password, userDto.PasswordHash,
                     Convert.FromBase64String(userDto.PasswordSalt)))
             {
-                var token = GenerateJwtToken(user.Username);
+                var token = GenerateJwtToken(user.Username, userDto.Id);
                 return Ok(new { token, });
             }
         }
@@ -78,16 +79,34 @@ public class AuthenticationController(Users users) : ControllerBase
     }
     
     /// <summary>
+    /// Gets the logged-in user's ID.
+    /// </summary>
+    /// <returns>The logged-in user's ID, or -1 if the claim containing the user ID is not found.</returns>
+    long GetLoggedUserId()
+    {
+        var claim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier && long.TryParse(c.Value, out _));
+        
+        if (long.TryParse(claim?.Value, out var result))
+        {
+            return result;
+        }
+        
+        return -1;
+    }
+    
+    /// <summary>
     /// Generates a JWT token for the given username.
     /// </summary>
     /// <param name="username">The username to generate the JWT token for.</param>
+    /// <param name="userId">The user ID to generate the JWT token for.</param>
     /// <returns>The JWT token.</returns>
-    private string GenerateJwtToken(string username)
+    private string GenerateJwtToken(string username, long userId)
     {
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.NameId, userId.ToString()),
         };
         
         var key = new SymmetricSecurityKey(Program.JwtKey);

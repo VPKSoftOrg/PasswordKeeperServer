@@ -10,7 +10,7 @@ namespace PasswordKeeper.BusinessLogic;
 public class Users(PasswordKeeper.DataAccess.Users users)
 {
     /// <inheritdoc cref="PasswordKeeper.DataAccess.Users.UpsertUser"/>
-    public async Task<bool> UpsertUser(UserDto userDto)
+    public async Task<UserDto?> UpsertUser(UserDto userDto)
     {
         return await users.UpsertUser(userDto);
     }
