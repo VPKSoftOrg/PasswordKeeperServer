@@ -30,8 +30,8 @@ public class Users(IDbContextFactory<Entities> dbContextFactory, IMapper mapper)
     /// Upserts a user. If the user doesn't exist, inserts it, otherwise updates it.
     /// </summary>
     /// <param name="userDto">The user to upsert.</param>
-    /// <returns><c>true</c> if the user was upserted successfully, otherwise <c>false</c>.</returns>
-    public async Task<bool> UpsertUser(UserDto userDto)
+    /// <returns>The upserted user data or <c>null</c> if the operation failed.</returns>
+    public async Task<UserDto?> UpsertUser(UserDto userDto)
     {
         await using var context = await dbContextFactory.CreateDbContextAsync();
         
@@ -49,6 +49,6 @@ public class Users(IDbContextFactory<Entities> dbContextFactory, IMapper mapper)
         
         await context.SaveChangesAsync();
         
-        return true;
+        return mapper.Map<UserDto>(user);
     }
 }
