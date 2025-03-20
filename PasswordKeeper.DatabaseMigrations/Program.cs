@@ -2,7 +2,7 @@
 using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DbMigrate;
+namespace PasswordKeeper.DatabaseMigrations;
 
 /// <summary>
 /// The console application.

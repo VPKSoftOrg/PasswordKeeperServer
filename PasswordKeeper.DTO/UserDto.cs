@@ -21,4 +21,7 @@ public class UserDto : IUser
     /// <inheritdoc cref="IUser.PasswordSalt" />
     [JsonIgnore]
     public string PasswordSalt { get; set; } = string.Empty;
+    
+    /// <inheritdoc cref="IUser.IsAdmin" />
+    public bool IsAdmin { get; set; }    
 }
