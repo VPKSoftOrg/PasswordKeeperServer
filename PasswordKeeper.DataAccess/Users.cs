@@ -27,6 +27,38 @@ public class Users(IDbContextFactory<Entities> dbContextFactory, IMapper mapper)
     }
 
     /// <summary>
+    /// Gets the user with the given ID, or null if no such user exists.
+    /// </summary>
+    /// <param name="id">The user ID to search for.</param>
+    /// <returns>The user with the given ID, or null if it doesn't exist.</returns>
+    public async Task<UserDto?> GetUserById(int id)
+    {
+        await using var context = await dbContextFactory.CreateDbContextAsync();
+
+        var user = await context.Users.FirstOrDefaultAsync(user => user.Id == id);
+        
+        return mapper.Map<UserDto?>(user);
+    }
+
+
+    /// <summary>
+    /// Checks if users exist in the database, optionally filtering by admin status.
+    /// </summary>
+    /// <param name="admin">If <c>null</c>, checks if any users exist. If <c>true</c>, checks if any admin users exist. If <c>false</c>, checks if any non-admin users exist.</param>
+    /// <returns><c>true</c> if the specified users exist, <c>false</c> otherwise.</returns>
+    public async Task<bool> UsersExist(bool? admin = null)
+    {
+        await using var context = await dbContextFactory.CreateDbContextAsync();
+
+        if (admin == null)
+        {
+            return await context.Users.AnyAsync();    
+        }
+        
+        return admin.Value ? await context.Users.AnyAsync(user => user.IsAdmin) : await context.Users.AnyAsync(user => !user.IsAdmin);
+    }
+    
+    /// <summary>
     /// Upserts a user. If the user doesn't exist, inserts it, otherwise updates it.
     /// </summary>
     /// <param name="userDto">The user to upsert.</param>

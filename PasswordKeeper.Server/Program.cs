@@ -9,7 +9,7 @@ using PasswordKeeper.BusinessLogic;
 using PasswordKeeper.DAO;
 using PasswordKeeper.DataAccess;
 
-namespace PasswordKeeperServer;
+namespace PasswordKeeper.Server;
 
 /// <summary>
 /// The ASP.NET Core entry point.

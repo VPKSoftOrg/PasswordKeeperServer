@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 
-namespace PasswordKeeperServer.Controllers.Extensions;
+namespace PasswordKeeper.Server.Controllers.Extensions;
 
 /// <summary>
 /// Extension methods for the <see cref="ControllerBase"/> class.
@@ -22,5 +22,14 @@ public static class ControllerExtensions
         }
         
         return -1;
+    }
+    
+    /// <summary>
+    /// Gets the logged-in user's name.
+    /// </summary>
+    /// <returns>The logged-in user's name, or an empty string if the user is not logged in.</returns>
+    public static string GetLoggedUserName(this ControllerBase controllerBase)
+    {
+        return controllerBase.User.Identity?.Name ?? string.Empty;
     }
 }

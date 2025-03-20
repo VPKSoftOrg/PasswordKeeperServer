@@ -21,6 +21,18 @@ public class Users(PasswordKeeper.DataAccess.Users users)
         return await users.GetUserByName(name);
     }
     
+    /// <inheritdoc cref="PasswordKeeper.DataAccess.Users.GetUserById"/>
+    public async Task<UserDto?> GetUserById(int id)
+    {
+        return await users.GetUserById(id);
+    }
+
+    /// <inheritdoc cref="PasswordKeeper.DataAccess.Users.UsersExist"/>    
+    public async Task<bool> UsersExist(bool? admin = null)
+    {
+        return await users.UsersExist(admin);
+    }
+    
     private const int IterationCount = 1000000;
 
     /// <summary>

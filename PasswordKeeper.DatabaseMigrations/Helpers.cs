@@ -1,4 +1,4 @@
-﻿namespace DbMigrate;
+﻿namespace PasswordKeeper.DatabaseMigrations;
 
 /// <summary>
 /// Some static helper methods.

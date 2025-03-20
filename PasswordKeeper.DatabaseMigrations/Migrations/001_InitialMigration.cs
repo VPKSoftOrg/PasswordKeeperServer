@@ -1,7 +1,7 @@
 ﻿using FluentMigrator;
 using PasswordKeeper.DAO;
 
-namespace DbMigrate.Migrations;
+namespace PasswordKeeper.DatabaseMigrations.Migrations;
 
 /// <summary>
 /// The initial database migration.
@@ -17,12 +17,13 @@ public class InitialMigration : Migration
             .WithColumn(nameof(KeyData.JwtSecurityKey))
             // Add maximum of 4096-bit key as base64 string
             .AsString(Helpers.Base64ByteCount(Helpers.ByteCountFromBits(4096))).NotNullable();
-        
+
         this.Create.Table(nameof(User)).InSchema(Program.DatabaseName)
             .WithColumn(nameof(User.Id)).AsInt64().NotNullable().PrimaryKey().Identity()
             .WithColumn(nameof(User.UserName)).AsString(255).NotNullable().Unique()
             .WithColumn(nameof(User.PasswordHash)).AsString(1000).NotNullable()
-            .WithColumn(nameof(User.PasswordSalt)).AsString(1000).NotNullable();
+            .WithColumn(nameof(User.PasswordSalt)).AsString(1000).NotNullable()
+            .WithColumn(nameof(User.IsAdmin)).AsBoolean().NotNullable().WithDefaultValue(false);
     }
 
     /// <inheritdoc cref="MigrationBase.Down" />

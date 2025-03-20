@@ -24,4 +24,9 @@ public interface IUser
     /// The salt of the user's password.
     /// </summary>
     string PasswordSalt { get; set; }
+    
+    /// <summary>
+    /// Whether the user is an admin.
+    /// </summary>
+    bool IsAdmin { get; set; }
 }

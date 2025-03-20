@@ -24,4 +24,7 @@ public class User : IUser
     /// <inheritdoc cref="IUser.PasswordSalt" />
     [MaxLength(1000)]
     public string PasswordSalt { get; set; } = string.Empty;
+    
+    /// <inheritdoc cref="IUser.IsAdmin" />
+    public bool IsAdmin { get; set; }
 }
