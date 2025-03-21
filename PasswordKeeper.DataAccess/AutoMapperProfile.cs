@@ -16,5 +16,6 @@ public class AutoMapperProfile : Profile
     {
         CreateMap<User, UserDto>();
         CreateMap<UserDto, User>().ForMember(f => f.Id, o => o.Ignore());
+        CreateMap<Collection, CollectionDto>().ReverseMap();
     }
 }

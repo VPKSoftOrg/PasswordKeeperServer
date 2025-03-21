@@ -10,7 +10,7 @@ namespace PasswordKeeper.DAO;
 [Table(nameof(User))]
 public class User : IUser
 {
-    /// <inheritdoc cref="IUser.Id" />
+    /// <inheritdoc cref="IHasId.Id" />
     public long Id { get; set; }
     
     /// <inheritdoc cref="IUser.UserName" />

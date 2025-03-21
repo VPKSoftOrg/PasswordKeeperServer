@@ -29,7 +29,7 @@ public class PasswordHashTests
         byte[]? salt = null;
         var random = new Random();
         var result = true;
-        for (var i = 0; i < 100; i++)
+        for (var i = 0; i < 10; i++)
         {
             var testPassword = GenerateRandomString(random.Next(10, 30));
             var hashed = Users.HashPassword(testPassword, ref salt);

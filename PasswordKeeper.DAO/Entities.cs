@@ -15,7 +15,19 @@ public sealed class Entities : DbContext
     {
         KeyData = Set<KeyData>();
         Users = Set<User>();
+        Collections = Set<Collection>();
+        CollectionSettings = Set<CollectionSettings>();
     }
+
+    /// <summary>
+    /// The <c>CollectionSettings</c> database table.
+    /// </summary>
+    public DbSet<CollectionSettings> CollectionSettings { get; set; }
+
+    /// <summary>
+    /// The <c>Collection</c> database table.
+    /// </summary>
+    public DbSet<Collection> Collections { get; set; }
 
     /// <summary>
     /// The <c>User</c> database table.
@@ -32,9 +44,12 @@ public sealed class Entities : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<KeyData>().HasKey(f => f.Id);
+        
         modelBuilder.Entity<User>(f =>
         {
             f.HasKey(i => i.Id);
         });
+        
+        modelBuilder.Entity<Collection>().HasKey(f => f.Id);
     }
 }

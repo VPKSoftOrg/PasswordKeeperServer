@@ -3,13 +3,8 @@
 /// <summary>
 /// An interface for the shared members of the <c>User</c> database table DAO/TDO shared members.
 /// </summary>
-public interface IUser
+public interface IUser : IHasId
 {
-    /// <summary>
-    /// The unique identifier for the user.
-    /// </summary>
-    long Id { get; set; }
-    
     /// <summary>
     /// The name of the user.
     /// </summary>
