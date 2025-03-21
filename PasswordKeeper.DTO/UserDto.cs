@@ -8,7 +8,7 @@ namespace PasswordKeeper.DTO;
 /// </summary>
 public class UserDto : IUser
 {
-    /// <inheritdoc cref="IUser.Id" />
+    /// <inheritdoc cref="IHasId.Id" />
     public long Id { get; set; }
     
     /// <inheritdoc cref="IUser.UserName" />
