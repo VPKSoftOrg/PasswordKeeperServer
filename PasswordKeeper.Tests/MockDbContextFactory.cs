@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PasswordKeeper.Classes;
 using PasswordKeeper.DAO;
 
 namespace PasswordKeeper.Tests;
@@ -19,7 +20,7 @@ public class MockDbContextFactory(string testClassName) : IDisposableContextFact
     public Entities CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<Entities>()
-            .UseSqlite($"Data Source=./{testClassName}.db;Pooling=False;")
+            .UseSqlite(DatabaseUtilities.GetSQLiteConnectionString(testClassName))
             .Options;
         
         context = new Entities(options);

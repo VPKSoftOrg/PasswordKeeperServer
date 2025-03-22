@@ -34,6 +34,12 @@ public class Users(PasswordKeeper.DataAccess.Users users)
     {
         return await users.UsersExist(admin);
     }
+
+    /// <inheritdoc cref="PasswordKeeper.DataAccess.Users.GetAllUsers"/>
+    public async Task<IEnumerable<UserDto>> GetAllUsers()
+    {
+        return await users.GetAllUsers();
+    }
     
     private const int IterationCount = 1000000;
 

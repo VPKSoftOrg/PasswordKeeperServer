@@ -83,4 +83,15 @@ public class Users(IDbContextFactory<Entities> dbContextFactory, IMapper mapper)
         
         return mapper.Map<UserDto>(user);
     }
+    
+    /// <summary>
+    /// Gets all users.
+    /// </summary>
+    /// <returns>A collection of all users.</returns>
+    public async Task<IEnumerable<UserDto>> GetAllUsers()
+    {
+        await using var context = await dbContextFactory.CreateDbContextAsync();
+        
+        return mapper.Map<IEnumerable<UserDto>>(await context.Users.ToListAsync());
+    }
 }

@@ -60,13 +60,14 @@ public class ControllerTests
         var dbContextFactory = Helpers.GetMockDbContextFactory(nameof(ControllerTests));
         var dataAccess = new PasswordKeeper.DataAccess.Users(dbContextFactory, Helpers.CreateMapper());
         var businessLogic = new PasswordKeeper.BusinessLogic.Users(dataAccess);
-        var controller = new AuthenticationController(businessLogic);
+        var authenticationController = new AuthenticationController(businessLogic);
+        var usersController = new UsersController(businessLogic);
         var loginData = new AuthenticationController.UserLogin("firsUserIsAdmin", "Pa1sword%");
-        await controller.Login(loginData);
+        await authenticationController.Login(loginData);
         
-        var user = new AuthenticationController.UserChangeRequest(0, "normalUser", "pAssw0rd_");
+        var user = new UsersController.UserChangeRequest(0, "normalUser", "pAssw0rd_");
 
-        var createdUser = await controller.CreateUser(user);
+        var createdUser = await usersController.CreateUser(user);
         
         Assert.That(createdUser, Is.TypeOf<OkObjectResult>());
         var userDto = ((OkObjectResult)createdUser).Value as UserDto;

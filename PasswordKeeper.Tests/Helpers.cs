@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using PasswordKeeper.Classes;
 using PasswordKeeper.DAO;
 using PasswordKeeper.DataAccess;
 
@@ -19,7 +20,7 @@ public static class Helpers
     public static Entities GetMemoryContext(string testClassName)
     {
         var options = new DbContextOptionsBuilder<Entities>()
-            .UseSqlite($"Data Source=./{testClassName}.db;Pooling=False;")
+            .UseSqlite(DatabaseUtilities.GetSQLiteConnectionString(testClassName))
             .Options;
         
         return new Entities(options);
