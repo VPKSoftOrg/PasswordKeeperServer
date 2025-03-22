@@ -19,7 +19,7 @@ public class MockDbContextFactory(string testClassName) : IDisposableContextFact
     public Entities CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<Entities>()
-            .UseSqlite($"Data Source=./{testClassName}.db")
+            .UseSqlite($"Data Source=./{testClassName}.db;Pooling=False;")
             .Options;
         
         context = new Entities(options);

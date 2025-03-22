@@ -19,7 +19,7 @@ public static class Helpers
     public static Entities GetMemoryContext(string testClassName)
     {
         var options = new DbContextOptionsBuilder<Entities>()
-            .UseSqlite($"Data Source=./{testClassName}.db")
+            .UseSqlite($"Data Source=./{testClassName}.db;Pooling=False;")
             .Options;
         
         return new Entities(options);
