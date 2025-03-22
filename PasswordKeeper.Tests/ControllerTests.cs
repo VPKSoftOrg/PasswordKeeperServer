@@ -65,7 +65,7 @@ public class ControllerTests
         var loginData = new AuthenticationController.UserLogin("firsUserIsAdmin", "Pa1sword%");
         await authenticationController.Login(loginData);
         
-        var user = new UsersController.UserChangeRequest(0, "normalUser", "pAssw0rd_");
+        var user = new UsersController.UserChangeRequest(0, "normalUser", "pAssw0rd_", "Normal User");
 
         var createdUser = await usersController.CreateUser(user);
         

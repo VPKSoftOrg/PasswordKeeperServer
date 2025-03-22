@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordKeeper.BusinessLogic;
-using PasswordKeeper.Classes;
-using PasswordKeeper.DTO;
-using PasswordKeeper.Server.Controllers.Extensions;
 
 namespace PasswordKeeper.Server.Controllers;
 

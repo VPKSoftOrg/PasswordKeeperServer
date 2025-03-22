@@ -123,6 +123,7 @@ public class Users(PasswordKeeper.DataAccess.Users users)
                 PasswordHash = HashPassword(password, ref salt),
                 PasswordSalt = Convert.ToBase64String(salt!),
                 IsAdmin = true,
+                UserFullName = "Administrator",
             };
 
             userDto = await users.UpsertUser(userDto);

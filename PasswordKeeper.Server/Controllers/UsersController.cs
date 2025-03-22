@@ -19,7 +19,7 @@ public class UsersController(Users users) : ControllerBase
     /// <param name="UserId">The ID of the user to change.</param>
     /// <param name="Username">The new username for the user.</param>
     /// <param name="Password">The new password for the user.</param> 
-    public record UserChangeRequest(int UserId, string Username, string Password);
+    public record UserChangeRequest(int UserId, string Username, string Password, string UserFullName);
     
     /// <summary>
     /// Creates a new user if the requester is admin.
@@ -63,6 +63,7 @@ public class UsersController(Users users) : ControllerBase
                 PasswordHash = string.Empty,
                 PasswordSalt = string.Empty,
                 IsAdmin = false,
+                UserFullName = user.UserFullName,
             };
         
             var salt = Convert.FromBase64String(userDto.PasswordSalt);
@@ -114,9 +115,9 @@ public class UsersController(Users users) : ControllerBase
     }
     
     /// <summary>
-    /// Updates the user's username if the requester is authorized.
+    /// Updates the user's username and full name if the requester is authorized.
     /// </summary>
-    /// <param name="user">The user change request containing the user ID and new username.</param>
+    /// <param name="user">The user change request containing the user ID, new username and new full name.</param>
     /// <returns>
     /// Unauthorized if the requester is not the user or admin, NotFound if the user does not exist,
     /// otherwise BadRequest if the upsert operation fails, or Ok with the updated user data.
@@ -141,6 +142,7 @@ public class UsersController(Users users) : ControllerBase
         }
         
         userDto.Username = user.Username;
+        userDto.UserFullName = user.UserFullName;
         var result = await users.UpsertUser(userDto);
         
         return result is null ? BadRequest() : Ok(result);

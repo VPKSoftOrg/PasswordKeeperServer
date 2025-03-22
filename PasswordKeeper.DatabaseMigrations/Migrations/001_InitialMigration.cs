@@ -24,6 +24,7 @@ public class InitialMigration : Migration
         this.Create.Table(nameof(User)).InSchemaIf(Program.DatabaseName, !isSqlite)
             .WithColumn(nameof(User.Id)).AsInt64().NotNullable().PrimaryKey().Identity()
             .WithColumn(nameof(User.Username)).AsString(255).NotNullable().Unique()
+            .WithColumn(nameof(User.UserFullName)).AsString(512).NotNullable()
             .WithColumn(nameof(User.PasswordHash)).AsString(1000).NotNullable()
             .WithColumn(nameof(User.PasswordSalt)).AsString(1000).NotNullable()
             .WithColumn(nameof(User.IsAdmin)).AsBoolean().NotNullable().WithDefaultValue(false);
