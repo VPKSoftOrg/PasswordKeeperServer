@@ -34,7 +34,7 @@ public static class Helpers
     {
         return new MockDbContextFactory(testClassName);
     }
-    
+
     /// <summary>
     /// Deletes the database file.
     /// </summary>
@@ -42,19 +42,12 @@ public static class Helpers
     public static void DeleteDatabase(string testClassName)
     {
         var dbFile = $"./{testClassName}.db";
-        try
+        if (File.Exists(dbFile))
         {
-            if (File.Exists(dbFile))
-            {
-                File.Delete(dbFile);
-            }
-        }
-        catch
-        {
-            // Ignore
+            File.Delete(dbFile);
         }
     }
-    
+
     /// <summary>
     /// Creates an instance to a class implementing the <see cref="IMapper"/> interface.
     /// </summary>

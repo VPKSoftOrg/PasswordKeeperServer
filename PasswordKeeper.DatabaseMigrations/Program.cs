@@ -50,7 +50,8 @@ public class Program
         string connectionString;
         if (TestDbName != null)
         {
-            connectionString = $"Data Source=./{TestDbName}.db";
+            // NOTE: Pooling=False is required for SQLite for the database file to be released after migrations!
+            connectionString = $"Data Source=./{TestDbName}.db;Pooling=False;";
             IsTestDb = true;
         }
         else
