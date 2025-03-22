@@ -11,6 +11,11 @@ public interface IUser : IHasId
     string Username { get; set; }
     
     /// <summary>
+    /// The full name of the user.
+    /// </summary>
+    string UserFullName { get; set; }
+    
+    /// <summary>
     /// The password of the user.
     /// </summary>
     string PasswordHash { get; set; }

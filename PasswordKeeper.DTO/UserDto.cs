@@ -14,6 +14,9 @@ public class UserDto : IUser
     /// <inheritdoc cref="IUser.Username" />
     public string Username { get; set; } = string.Empty;
 
+    /// <inheritdoc cref="IUser.UserFullName" />
+    public string UserFullName { get; set; } = string.Empty;
+
     /// <inheritdoc cref="IUser.PasswordHash" />
     [JsonIgnore]
     public string PasswordHash { get; set; } = string.Empty;
