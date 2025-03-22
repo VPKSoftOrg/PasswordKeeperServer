@@ -58,5 +58,10 @@ public enum LoginRejectReason
     /// <summary>
     /// Data related to the user was not found.
     /// </summary>
-    NotFound,
+    NotFound = 10,
+    
+    /// <summary>
+    /// The user already exists.
+    /// </summary>
+    UserAlreadyExists = 11,
 }

@@ -30,7 +30,7 @@ public static class Helpers
     /// </summary>
     /// <param name="testClassName">The name of the test class.</param>
     /// <returns>The database context.</returns>
-    public static IDbContextFactory<Entities> GetMockDbContextFactory(string testClassName)
+    public static IDisposableContextFactory<Entities> GetMockDbContextFactory(string testClassName)
     {
         return new MockDbContextFactory(testClassName);
     }
@@ -42,9 +42,16 @@ public static class Helpers
     public static void DeleteDatabase(string testClassName)
     {
         var dbFile = $"./{testClassName}.db";
-        if (File.Exists(dbFile))
+        try
         {
-            File.Delete(dbFile);
+            if (File.Exists(dbFile))
+            {
+                File.Delete(dbFile);
+            }
+        }
+        catch
+        {
+            // Ignore
         }
     }
     

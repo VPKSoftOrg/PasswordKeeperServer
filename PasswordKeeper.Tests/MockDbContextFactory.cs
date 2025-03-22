@@ -8,8 +8,10 @@ namespace PasswordKeeper.Tests;
 /// </summary>
 /// <param name="testClassName">The name of the test class.</param>
 /// <seealso cref="IDbContextFactory{Entities}" />
-public class MockDbContextFactory(string testClassName) : IDbContextFactory<Entities>
+public class MockDbContextFactory(string testClassName) : IDisposableContextFactory<Entities>
 {
+    private Entities? context;
+    
     /// <summary>
     /// Creates a new SQLite database context.
     /// </summary>
@@ -20,6 +22,25 @@ public class MockDbContextFactory(string testClassName) : IDbContextFactory<Enti
             .UseSqlite($"Data Source=./{testClassName}.db")
             .Options;
         
-        return new Entities(options);
+        context = new Entities(options);
+
+        return context;
+    }
+
+    /// <inheritdoc cref="IDisposable.Dispose" />
+    public void Dispose()
+    {
+        context?.Dispose();
+        context = null;
+    }
+
+    /// <inheritdoc cref="IAsyncDisposable.DisposeAsync" />
+    public async ValueTask DisposeAsync()
+    {
+        if (context != null)
+        {
+            await context.DisposeAsync();
+            context = null;
+        }
     }
 }

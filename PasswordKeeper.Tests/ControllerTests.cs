@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PasswordKeeper.Classes;
 using PasswordKeeper.DatabaseMigrations;
+using PasswordKeeper.DTO;
 using PasswordKeeper.Interfaces.Enumerations;
 using PasswordKeeper.Server.Controllers;
+using PasswordKeeper.Server.Controllers.Extensions;
 
 namespace PasswordKeeper.Tests;
 
@@ -20,15 +22,18 @@ public class ControllerTests
         Helpers.DeleteDatabase(nameof(ControllerTests));
         Program.Main([$"-t {nameof(ControllerTests)}",]);
         Server.Program.GetJwtKey = Helpers.GetJwtKey;
+        ControllerExtensions.GetLoggedUserIdFunc = @base => 1;
+        ControllerExtensions.GetLoggedUserNameFunc = @base => "firsUserIsAdmin";
     }
     
     /// <summary>
-    /// Tests the authentication controller.
+    /// Tests the AuthenticationController.Login action.
     /// </summary>
     [Test]
-    public async Task AuthenticationControllerTest()
+    public async Task AuthenticationControllerLoginTest()
     {
-        var dataAccess = new PasswordKeeper.DataAccess.Users(Helpers.GetMockDbContextFactory(nameof(ControllerTests)), Helpers.CreateMapper());
+        var dbContextFactory = Helpers.GetMockDbContextFactory(nameof(ControllerTests));
+        var dataAccess = new PasswordKeeper.DataAccess.Users(dbContextFactory, Helpers.CreateMapper());
         var businessLogic = new PasswordKeeper.BusinessLogic.Users(dataAccess);
         var controller = new AuthenticationController(businessLogic);
         var loginData = new AuthenticationController.UserLogin("firsUserIsAdmin", "password");
@@ -43,5 +48,30 @@ public class ControllerTests
         loginData = new AuthenticationController.UserLogin("firsUserIsAdmin", "Pa1sword%");
         result = await controller.Login(loginData);
         Assert.That(result, Is.TypeOf<OkObjectResult>());
+        await dbContextFactory.DisposeAsync();
+    }
+    
+    /// <summary>
+    /// Tests the AuthenticationController.CreateUser action.
+    /// </summary>
+    [Test]
+    public async Task ControllerCreateUserTest()
+    {
+        var dbContextFactory = Helpers.GetMockDbContextFactory(nameof(ControllerTests));
+        var dataAccess = new PasswordKeeper.DataAccess.Users(dbContextFactory, Helpers.CreateMapper());
+        var businessLogic = new PasswordKeeper.BusinessLogic.Users(dataAccess);
+        var controller = new AuthenticationController(businessLogic);
+        var loginData = new AuthenticationController.UserLogin("firsUserIsAdmin", "Pa1sword%");
+        await controller.Login(loginData);
+        
+        var user = new AuthenticationController.UserChangeRequest(0, "normalUser", "pAssw0rd_");
+
+        var createdUser = await controller.CreateUser(user);
+        
+        Assert.That(createdUser, Is.TypeOf<OkObjectResult>());
+        var userDto = ((OkObjectResult)createdUser).Value as UserDto;
+        Assert.That(userDto, Is.TypeOf<UserDto>());
+        Assert.That(userDto.Username, Is.EqualTo("normalUser"));
+        await dbContextFactory.DisposeAsync();
     }
 }

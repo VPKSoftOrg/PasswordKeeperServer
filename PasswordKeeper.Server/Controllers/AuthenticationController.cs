@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PasswordKeeper.BusinessLogic;
 using PasswordKeeper.Classes;
+using PasswordKeeper.DTO;
 using PasswordKeeper.Server.Controllers.Extensions;
 
 namespace PasswordKeeper.Server.Controllers;
@@ -130,10 +131,63 @@ public class AuthenticationController(Users users) : ControllerBase
             return BadRequest(Passwords.UsernameMustBeAtLeast4CharactersLong);
         }
         
-        userDto.UserName = user.Username;
+        userDto.Username = user.Username;
         var result = await users.UpsertUser(userDto);
         
         return result is null ? BadRequest() : Ok(result);
+    }
+    
+    /// <summary>
+    /// Creates a new user if the requester is admin.
+    /// </summary>
+    /// <param name="user">The user data to create.</param>
+    /// <returns>
+    /// Unauthorized if the requester is not admin, BadRequest if the upsert operation fails,
+    /// otherwise Ok with the created user data.
+    /// </returns>
+    public async Task<IActionResult> CreateUser([FromBody] UserChangeRequest user)
+    {
+        var loggedUser = await users.GetUserById(this.GetLoggedUserId());
+        
+        if (await users.GetUserByName(user.Username) is not null)
+        {
+            return BadRequest(Passwords.UserAlreadyExists);
+        }
+
+        if (loggedUser == null)
+        {
+            return Unauthorized();
+        }
+
+        if (loggedUser.IsAdmin)
+        {
+            if (!Passwords.IsPasswordOk(user.Password, out var message, out _))
+            {
+                return BadRequest(message);
+            }
+            
+            if (user.Username.Length < 4)
+            {
+                return BadRequest(Passwords.UsernameMustBeAtLeast4CharactersLong);
+            }
+            
+            var userDto = new UserDto
+            {
+                Username = user.Username,
+                PasswordHash = string.Empty,
+                PasswordSalt = string.Empty,
+                IsAdmin = false,
+            };
+        
+            var salt = Convert.FromBase64String(userDto.PasswordSalt);
+            userDto.PasswordHash = Users.HashPassword(user.Password, ref salt);
+            userDto.PasswordSalt = Convert.ToBase64String(salt!);
+            var result = await users.UpsertUser(userDto);
+        
+            return result is null ? BadRequest() : Ok(result);
+        }
+
+        return Unauthorized();
     }
     
     /// <summary>
