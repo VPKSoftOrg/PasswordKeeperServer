@@ -41,7 +41,7 @@ public static class Program
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = Program.PseudoDomain,
                     ValidAudience = Program.PseudoDomain,
-                    IssuerSigningKey = new SymmetricSecurityKey(JwtKey),
+                    IssuerSigningKey = new SymmetricSecurityKey(GetJwtKey()),
                 };
             });
 
@@ -96,55 +96,52 @@ public static class Program
     private static byte[]? _jwtKey;
 
     internal const string PseudoDomain = "password_keeper_server.com";
-    
-    /// <summary>
-    /// A property to get the JWT key. If the database is empty, a new random key is generated and stored there.
-    /// </summary>
-    internal static byte[] JwtKey
-    {
-        get
-        {
-            // If the key is already in memory, return it
-            if (_jwtKey == null)
-            {
-                // Check the database for the key
-                using var connection = new MySql.Data.MySqlClient.MySqlConnection(_connectionString);
-                connection.Open();
-        
-                using var command = connection.CreateCommand();
-        
-                command.CommandText = @"SELECT JwtSecurityKey FROM KeyData";
-                var key = (string?)command.ExecuteScalar();
-                if (key != null)
-                {
-                    // If the key is in the database, use it
-                    _jwtKey = Convert.FromBase64String(key);
-                    connection.Close();
-                    return _jwtKey;
-                }
-                
-                // If the key is not in the database, generate a new one
-                var randomBytes = new byte[32];
-                using var rng = RandomNumberGenerator.Create();
-                rng.GetBytes(randomBytes);
-                _jwtKey = randomBytes;
 
-                // Store the key in the database
-                using var insertKeyCommand = connection.CreateCommand();
-                insertKeyCommand.CommandText = "INSERT INTO KeyData (JwtSecurityKey) VALUES (@key)";
-                insertKeyCommand.Parameters.Add(new MySqlParameter
-                {
-                    ParameterName = "@key",
-                    Value = Convert.ToBase64String(_jwtKey),
-                    MySqlDbType = MySqlDbType.Text,
-                });
-                
-                insertKeyCommand.ExecuteNonQuery();
+    /// <summary>
+    /// Gets the JWT key from the database or generates a new one if it is not in the database.
+    /// </summary>
+    public static Func<byte[]> GetJwtKey = () =>
+    {
+        // If the key is already in memory, return it
+        if (_jwtKey == null)
+        {
+            // Check the database for the key
+            using var connection = new MySql.Data.MySqlClient.MySqlConnection(_connectionString);
+            connection.Open();
+
+            using var command = connection.CreateCommand();
+
+            command.CommandText = @"SELECT JwtSecurityKey FROM KeyData";
+            var key = (string?)command.ExecuteScalar();
+            if (key != null)
+            {
+                // If the key is in the database, use it
+                _jwtKey = Convert.FromBase64String(key);
                 connection.Close();
-            }    
-            
-            // Return the key
-            return _jwtKey;
+                return _jwtKey;
+            }
+
+            // If the key is not in the database, generate a new one
+            var randomBytes = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+            _jwtKey = randomBytes;
+
+            // Store the key in the database
+            using var insertKeyCommand = connection.CreateCommand();
+            insertKeyCommand.CommandText = "INSERT INTO KeyData (JwtSecurityKey) VALUES (@key)";
+            insertKeyCommand.Parameters.Add(new MySqlParameter
+            {
+                ParameterName = "@key",
+                Value = Convert.ToBase64String(_jwtKey),
+                MySqlDbType = MySqlDbType.Text,
+            });
+
+            insertKeyCommand.ExecuteNonQuery();
+            connection.Close();
         }
-    } 
+
+        // Return the key
+        return _jwtKey;
+    };
 }

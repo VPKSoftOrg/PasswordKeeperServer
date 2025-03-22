@@ -25,8 +25,8 @@ public class Program
     /// <summary>
     /// The name of the database.
     /// </summary>
-    [Option(template: "-t|--test", optionType: CommandOptionType.NoValue, description: "Use the test database")]
-    public bool TestDb { get; } = false;
+    [Option(template: "-t|--test", Description = "Use the test database")]
+    public string? TestDbName { get; } = null;
 
     /// <summary>
     /// The connection string to use for the database.
@@ -39,7 +39,7 @@ public class Program
     /// The entry point for the application.
     /// </summary>
     /// <remarks>
-    /// If the <see cref="TestDb"/> option is specified, a test database is used and the connection string is
+    /// If the <see cref="TestDbName"/> option is specified, a test database is used and the connection string is
     /// inferred from the current working directory. Otherwise, the connection string is read from the command
     /// line option <see cref="ConnectionString"/>. The database is created if it doesn't exist, and then the
     /// migrations are run.
@@ -48,9 +48,9 @@ public class Program
     public void OnExecute()
     {
         string connectionString;
-        if (TestDb)
+        if (TestDbName != null)
         {
-            connectionString = $"Data Source=./{DatabaseName}.db";
+            connectionString = $"Data Source=./{TestDbName}.db";
             IsTestDb = true;
         }
         else
