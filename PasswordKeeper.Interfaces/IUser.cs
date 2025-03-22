@@ -8,7 +8,7 @@ public interface IUser : IHasId
     /// <summary>
     /// The name of the user.
     /// </summary>
-    string UserName { get; set; }
+    string Username { get; set; }
     
     /// <summary>
     /// The password of the user.

@@ -24,7 +24,7 @@ public class Users(PasswordKeeper.DataAccess.Users users)
     }
     
     /// <inheritdoc cref="PasswordKeeper.DataAccess.Users.GetUserById"/>
-    public async Task<UserDto?> GetUserById(int id)
+    public async Task<UserDto?> GetUserById(long id)
     {
         return await users.GetUserById(id);
     }
@@ -113,7 +113,7 @@ public class Users(PasswordKeeper.DataAccess.Users users)
             byte []? salt = null;
             userDto = new UserDto
             {
-                UserName = username,
+                Username = username,
                 PasswordHash = HashPassword(password, ref salt),
                 PasswordSalt = Convert.ToBase64String(salt!),
                 IsAdmin = true,

@@ -21,7 +21,7 @@ public class Users(IDbContextFactory<Entities> dbContextFactory, IMapper mapper)
     {
         await using var context = await dbContextFactory.CreateDbContextAsync();
 
-        var user = await context.Users.FirstOrDefaultAsync(user => user.UserName == name);
+        var user = await context.Users.FirstOrDefaultAsync(user => user.Username == name);
 
         return mapper.Map<UserDto?>(user);
     }
@@ -31,7 +31,7 @@ public class Users(IDbContextFactory<Entities> dbContextFactory, IMapper mapper)
     /// </summary>
     /// <param name="id">The user ID to search for.</param>
     /// <returns>The user with the given ID, or null if it doesn't exist.</returns>
-    public async Task<UserDto?> GetUserById(int id)
+    public async Task<UserDto?> GetUserById(long id)
     {
         await using var context = await dbContextFactory.CreateDbContextAsync();
 
@@ -67,7 +67,7 @@ public class Users(IDbContextFactory<Entities> dbContextFactory, IMapper mapper)
     {
         await using var context = await dbContextFactory.CreateDbContextAsync();
         
-        var user = await context.Users.FirstOrDefaultAsync(user => user.UserName == userDto.UserName);
+        var user = await context.Users.FirstOrDefaultAsync(user => user.Username == userDto.Username);
         
         if (user == null)
         {

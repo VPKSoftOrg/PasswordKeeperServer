@@ -13,9 +13,9 @@ public class User : IUser
     /// <inheritdoc cref="IHasId.Id" />
     public long Id { get; set; }
     
-    /// <inheritdoc cref="IUser.UserName" />
+    /// <inheritdoc cref="IUser.Username" />
     [MaxLength(255)]
-    public string UserName { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
 
     /// <inheritdoc cref="IUser.PasswordHash" />
     [MaxLength(1000)]

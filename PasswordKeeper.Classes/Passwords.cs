@@ -154,6 +154,11 @@ public static class Passwords
     /// An error message indicating that the username or password is invalid.
     /// </summary>
     public const string InvalidUsernameOrPassword = "Invalid username or password.";
+    
+    /// <summary>
+    /// An error message indicating that the user already exists.
+    /// </summary>
+    public const string UserAlreadyExists = "User already exists.";
 
     /// <summary>
     /// A read-only dictionary mapping login reject reasons to error messages.
@@ -179,6 +184,7 @@ public static class Passwords
                 FailedToCreateAdminUser),
             new KeyValuePair<LoginRejectReason, string>(LoginRejectReason.InvalidUsernameOrPassword,
                 InvalidUsernameOrPassword),
-            new KeyValuePair<LoginRejectReason, string>(LoginRejectReason.NotFound, string.Empty)
+            new KeyValuePair<LoginRejectReason, string>(LoginRejectReason.NotFound, string.Empty),
+            new KeyValuePair<LoginRejectReason, string>(LoginRejectReason.UserAlreadyExists, UserAlreadyExists),
         ])));
 }

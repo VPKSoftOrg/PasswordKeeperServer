@@ -19,7 +19,7 @@ public static class Helpers
     public static Entities GetMemoryContext(string testClassName)
     {
         var options = new DbContextOptionsBuilder<Entities>()
-            .UseSqlite($"Data Source=./{testClassName}.db")
+            .UseSqlite($"Data Source=./{testClassName}.db;Pooling=False;")
             .Options;
         
         return new Entities(options);
@@ -30,11 +30,11 @@ public static class Helpers
     /// </summary>
     /// <param name="testClassName">The name of the test class.</param>
     /// <returns>The database context.</returns>
-    public static IDbContextFactory<Entities> GetMockDbContextFactory(string testClassName)
+    public static IDisposableContextFactory<Entities> GetMockDbContextFactory(string testClassName)
     {
         return new MockDbContextFactory(testClassName);
     }
-    
+
     /// <summary>
     /// Deletes the database file.
     /// </summary>
@@ -47,7 +47,7 @@ public static class Helpers
             File.Delete(dbFile);
         }
     }
-    
+
     /// <summary>
     /// Creates an instance to a class implementing the <see cref="IMapper"/> interface.
     /// </summary>
