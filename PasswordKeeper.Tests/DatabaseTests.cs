@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PasswordKeeper.DAO;
 using PasswordKeeper.DatabaseMigrations;
 
 namespace PasswordKeeper.Tests;
@@ -15,6 +14,8 @@ public class DatabaseTests
     [SetUp]
     public void Setup()
     {
+        Helpers.DeleteDatabase(nameof(DatabaseTests));
+        Program.Main([$"-t {nameof(DatabaseTests)}",]);
     }
 
     /// <summary>
@@ -23,35 +24,9 @@ public class DatabaseTests
     [Test]
     public async Task UseEfCoreTest()
     {
-        DeleteDatabase();
-        Program.Main(["-t"]);
-        await using var context = GetMemoryContext();
+        var dbContextFactory = Helpers.GetMockDbContextFactory(nameof(DatabaseTests));
+        await using var context = await dbContextFactory.CreateDbContextAsync();
         _ = await context.Users.CountAsync();
         // TODO::More tests
-    }
-    
-    /// <summary>
-    /// Creates a new SQLite database context.
-    /// </summary>
-    /// <returns>The database context.</returns>
-    private static Entities GetMemoryContext()
-    {
-        var options = new DbContextOptionsBuilder<Entities>()
-            .UseSqlite($"Data Source=./{Program.DatabaseName}.db")
-            .Options;
-        
-        return new Entities(options);
-    } 
-    
-    /// <summary>
-    /// Deletes the database file.
-    /// </summary>
-    private static void DeleteDatabase()
-    {
-        var dbFile = $"./{PasswordKeeper.DatabaseMigrations.Program.DatabaseName}.db";
-        if (File.Exists(dbFile))
-        {
-            File.Delete(dbFile);
-        }
     }
 }

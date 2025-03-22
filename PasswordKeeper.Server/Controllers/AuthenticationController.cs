@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PasswordKeeper.BusinessLogic;
-using PasswordKeeper.DTO;
+using PasswordKeeper.Classes;
 using PasswordKeeper.Server.Controllers.Extensions;
 
 namespace PasswordKeeper.Server.Controllers;
@@ -38,55 +38,20 @@ public class AuthenticationController(Users users) : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] UserLogin user)
     {
-        var adminExists = await users.UsersExist(true);
-        UserDto? userDto = null;
-
-        if (user.Username.Length < 4)
-        {
-            return BadRequest("Username must be at least 4 characters long.");
-        }
-
-        if (!Helpers.IsPasswordOk(user.Password, out var message))
-        {
-            return BadRequest(message);
-        }
+        var result = await users.Login(user.Username, user.Password, Program.GetJwtKey(), Program.PseudoDomain);
         
-        // If no admin user exists, create one if the username is long enough and the password is valid
-        if (!adminExists)
+        if (result.Success)
         {
-            byte []? salt = null;
-            userDto = new UserDto
-            {
-                UserName = user.Username,
-                PasswordHash = Users.HashPassword(user.Password, ref salt),
-                PasswordSalt = Convert.ToBase64String(salt!),
-                IsAdmin = true,
-            };
-
-            userDto = await users.UpsertUser(userDto);
-
-            if (userDto is null)
-            {
-                return BadRequest("Failed to create admin user.");
-            }
-            
-            var token = Helpers.GenerateJwtToken(user.Username, userDto.Id);
-            return Ok(new { token, });
-        }
-
-        // An existing user, verify the password
-        if (userDto is not null)
+            return Ok(new { token = result.Message, });
+        } 
+        if (result is { Success: false, Unauthorized: false, })
         {
-            if (Users.VerifyPassword(user.Password, userDto.PasswordHash,
-                    Convert.FromBase64String(userDto.PasswordSalt)))
-            {
-                var token = Helpers.GenerateJwtToken(user.Username, userDto.Id);
-                return Ok(new { token, });
-            }
+            return BadRequest(result.Message);
         }
 
         return Unauthorized();
     }
+
 
     /// <summary>
     /// Checks a password against the password complexity requirements.
@@ -97,7 +62,7 @@ public class AuthenticationController(Users users) : ControllerBase
     [HttpPost]
     public IActionResult PasswordOk([FromBody] string password)
     {
-        var result = Helpers.IsPasswordOk(password, out var message);
+        var result = Passwords.IsPasswordOk(password, out var message, out _);
         return result ? Ok() : BadRequest(message);
     }
 
@@ -125,7 +90,7 @@ public class AuthenticationController(Users users) : ControllerBase
             return Unauthorized();
         }
         
-        if (!Helpers.IsPasswordOk(user.Password, out var message))
+        if (!Passwords.IsPasswordOk(user.Password, out var message, out _))
         {
             return BadRequest(message);
         }
@@ -162,7 +127,7 @@ public class AuthenticationController(Users users) : ControllerBase
      
         if (user.Username.Length < 4)
         {
-            return BadRequest("Username must be at least 4 characters long.");
+            return BadRequest(Passwords.UsernameMustBeAtLeast4CharactersLong);
         }
         
         userDto.UserName = user.Username;
