@@ -19,7 +19,8 @@ public class UsersController(Users users) : ControllerBase
     /// </summary>
     /// <param name="UserId">The ID of the user to change.</param>
     /// <param name="Username">The new username for the user.</param>
-    /// <param name="Password">The new password for the user.</param> 
+    /// <param name="Password">The new password for the user.</param>
+    /// <param name="UserFullName">The new full name for the user.</param>
     public record UserChangeRequest(int UserId, string Username, string Password, string UserFullName);
     
     /// <summary>
