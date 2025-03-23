@@ -41,6 +41,12 @@ public class Users(PasswordKeeper.DataAccess.Users users)
         return await users.GetAllUsers();
     }
     
+    /// <inheritdoc cref="PasswordKeeper.DataAccess.Users.DeleteUser"/>
+    public async Task DeleteUser(long id)
+    {
+        await users.DeleteUser(id);
+    }
+    
     private const int IterationCount = 1000000;
 
     /// <summary>
@@ -133,8 +139,12 @@ public class Users(PasswordKeeper.DataAccess.Users users)
                 return new LoginResult(false, Passwords.CreateMessageString(LoginRejectReason.FailedToCreateAdminUser), false, LoginRejectReason.FailedToCreateAdminUser);
             }
             
-            var token = Passwords.GenerateJwtToken(username, userDto.Id, jwtKey, pseudoDomain);
+            var token = Passwords.GenerateJwtToken(username, userDto.Id, jwtKey, pseudoDomain, userDto.IsAdmin);
             return new LoginResult(true, token, false, LoginRejectReason.None);
+        }
+        else
+        {
+            userDto = await users.GetUserByName(username);
         }
 
         // An existing user, verify the password
@@ -143,7 +153,7 @@ public class Users(PasswordKeeper.DataAccess.Users users)
             if (Users.VerifyPassword(password, userDto.PasswordHash,
                     Convert.FromBase64String(userDto.PasswordSalt)))
             {
-                var token = Passwords.GenerateJwtToken(username, userDto.Id, jwtKey, pseudoDomain);
+                var token = Passwords.GenerateJwtToken(username, userDto.Id, jwtKey, pseudoDomain, userDto.IsAdmin);
                 return new LoginResult(true, token, false, LoginRejectReason.None);
             }
         }

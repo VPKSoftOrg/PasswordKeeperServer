@@ -18,14 +18,16 @@ public static class Passwords
     /// <param name="userId">The user ID to generate the JWT token for.</param>
     /// <param name="jwtKey">The JWT key to use for signing the token.</param>
     /// <param name="pseudoDomain">The pseudo domain to use for the token issuer and audience.</param>
+    /// <param name="isAdmin">Whether the user is an admin or not.</param>
     /// <returns>The JWT token.</returns>
-    public static string GenerateJwtToken(string username, long userId, byte[] jwtKey, string pseudoDomain)
+    public static string GenerateJwtToken(string username, long userId, byte[] jwtKey, string pseudoDomain, bool isAdmin)
     {
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.NameId, userId.ToString()),
+            new Claim(ClaimTypes.Role, isAdmin ? "Admin" : "User"),
         };
         
         var key = new SymmetricSecurityKey(jwtKey);
@@ -35,7 +37,11 @@ public static class Passwords
             issuer: pseudoDomain,
             audience: pseudoDomain,
             claims: claims,
+            #if DEBUG
+            expires: DateTime.Now.AddYears(1),
+            #else
             expires: DateTime.Now.AddMinutes(30),
+            #endif
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

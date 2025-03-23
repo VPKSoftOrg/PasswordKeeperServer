@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PasswordKeeper.BusinessLogic;
 using PasswordKeeper.Classes;
 using PasswordKeeper.DTO;
@@ -31,6 +32,7 @@ public class UsersController(Users users) : ControllerBase
     /// </returns>
     [HttpPost]
     [Route(nameof(CreateUser))]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateUser([FromBody] UserChangeRequest user)
     {
         var loggedUser = await users.GetUserById(this.GetLoggedUserId());
@@ -66,7 +68,7 @@ public class UsersController(Users users) : ControllerBase
                 UserFullName = user.UserFullName,
             };
         
-            var salt = Convert.FromBase64String(userDto.PasswordSalt);
+            var salt = string.IsNullOrEmpty(userDto.PasswordSalt) ? null : Convert.FromBase64String(userDto.PasswordSalt);
             userDto.PasswordHash = Users.HashPassword(user.Password, ref salt);
             userDto.PasswordSalt = Convert.ToBase64String(salt!);
             var result = await users.UpsertUser(userDto);
@@ -146,6 +148,49 @@ public class UsersController(Users users) : ControllerBase
         var result = await users.UpsertUser(userDto);
         
         return result is null ? BadRequest() : Ok(result);
+    }
+    
+    /// <summary>
+    /// Deletes the user with the given ID if the requester is admin.
+    /// </summary>
+    /// <param name="userId">The ID of the user to delete.</param>
+    /// <returns>Unauthorized if the requester is not admin, NotFound if the user does not exist, otherwise Ok.</returns>
+    [Route(nameof(DeleteUser))]
+    [HttpDelete]
+    public async Task<IActionResult> DeleteUser(int userId)
+    {
+        var userDto = await users.GetUserById(userId);
+        
+        if (userDto is null)
+        {
+            return NotFound();
+        }
+        
+        var loggedUserId = this.GetLoggedUserId();
+        var isLoggedUserAdmin = await users.GetUserById(loggedUserId) is { IsAdmin: true };
+        
+        // Only admins can delete users and admins cannot delete themselves
+        if (!isLoggedUserAdmin || loggedUserId == userId)
+        {
+            return Unauthorized();
+        }
+        
+        await users.DeleteUser(userId);
+        
+        return Ok();
+    }
+    
+    /// <summary>
+    /// Gets all users.
+    /// </summary>
+    /// <returns>A collection of all users.</returns>
+    [Route(nameof(GetAllUsers))]
+    [HttpGet]
+    [Authorize(Roles = "Admin")]
+    public async Task<IEnumerable<UserDto>> GetAllUsers()
+    {
+        
+        return await users.GetAllUsers();
     }
     
     /// <summary>

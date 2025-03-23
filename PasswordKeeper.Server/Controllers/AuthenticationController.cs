@@ -51,4 +51,15 @@ public class AuthenticationController(Users users) : ControllerBase
     {
         return Ok();
     }
+    
+    /// <summary>
+    /// An endpoint for testing admin access.
+    /// </summary>
+    /// <returns>An Ok result if the request is authorized.</returns>
+    [Route(nameof(TestAdminAuthorized))]
+    [Authorize(Roles = "Admin")]
+    public IActionResult TestAdminAuthorized()
+    {
+        return Ok();
+    }
 }
