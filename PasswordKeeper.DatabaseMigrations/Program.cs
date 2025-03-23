@@ -2,6 +2,8 @@
 using FluentMigrator.Runner;
 using Microsoft.Extensions.DependencyInjection;
 using McMaster.Extensions.CommandLineUtils;
+using PasswordKeeper.Classes;
+
 // ReSharper disable MemberCanBePrivate.Global
 
 namespace PasswordKeeper.DatabaseMigrations;
@@ -51,7 +53,7 @@ public class Program
         if (TestDbName != null)
         {
             // NOTE: Pooling=False is required for SQLite for the database file to be released after migrations!
-            connectionString = $"Data Source=./{TestDbName}.db;Pooling=False;";
+            connectionString = DatabaseUtilities.GetSQLiteConnectionString(TestDbName);
             IsTestDb = true;
         }
         else

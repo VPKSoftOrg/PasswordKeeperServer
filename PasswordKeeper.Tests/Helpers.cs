@@ -1,6 +1,5 @@
 ﻿using System.Security.Cryptography;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using PasswordKeeper.DAO;
 using PasswordKeeper.DataAccess;
 
@@ -11,20 +10,6 @@ namespace PasswordKeeper.Tests;
 /// </summary>
 public static class Helpers
 {
-    /// <summary>
-    /// Creates a new SQLite database context.
-    /// </summary>
-    /// <param name="testClassName">The name of the test class.</param>
-    /// <returns>The database context.</returns>
-    public static Entities GetMemoryContext(string testClassName)
-    {
-        var options = new DbContextOptionsBuilder<Entities>()
-            .UseSqlite($"Data Source=./{testClassName}.db;Pooling=False;")
-            .Options;
-        
-        return new Entities(options);
-    } 
-    
     /// <summary>
     /// Creates a new SQLite database context factory.
     /// </summary>

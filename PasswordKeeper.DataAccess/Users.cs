@@ -83,4 +83,35 @@ public class Users(IDbContextFactory<Entities> dbContextFactory, IMapper mapper)
         
         return mapper.Map<UserDto>(user);
     }
+    
+    /// <summary>
+    /// Deletes the user with the given ID.
+    /// </summary>
+    /// <param name="id">The ID of the user to delete.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public async Task DeleteUser(long id)
+    {
+        await using var context = await dbContextFactory.CreateDbContextAsync();
+        
+        var user = await context.Users.FirstOrDefaultAsync(user => user.Id == id);
+        
+        if (user != null)
+        {
+            context.Users.Remove(user);
+            await context.SaveChangesAsync();
+        }
+        
+        // TODO:Delete user data
+    }
+    
+    /// <summary>
+    /// Gets all users.
+    /// </summary>
+    /// <returns>A collection of all users.</returns>
+    public async Task<IEnumerable<UserDto>> GetAllUsers()
+    {
+        await using var context = await dbContextFactory.CreateDbContextAsync();
+        
+        return mapper.Map<IEnumerable<UserDto>>(await context.Users.ToListAsync());
+    }
 }

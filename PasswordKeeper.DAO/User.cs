@@ -17,6 +17,10 @@ public class User : IUser
     [MaxLength(255)]
     public string Username { get; set; } = string.Empty;
 
+    /// <inheritdoc cref="IUser.UserFullName" />
+    [MaxLength(512)]
+    public string UserFullName { get; set; } = string.Empty;
+
     /// <inheritdoc cref="IUser.PasswordHash" />
     [MaxLength(1000)]
     public string PasswordHash { get; set; } = string.Empty;

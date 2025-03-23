@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +44,7 @@ public static class Program
                     ValidIssuer = Program.PseudoDomain,
                     ValidAudience = Program.PseudoDomain,
                     IssuerSigningKey = new SymmetricSecurityKey(GetJwtKey()),
+                    RoleClaimType = ClaimTypes.Role,
                 };
             });
 
