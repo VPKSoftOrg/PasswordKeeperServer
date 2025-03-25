@@ -30,4 +30,8 @@ RUN dotnet publish "PasswordKeeper.Server.csproj" -c $BUILD_CONFIGURATION -o /ap
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+RUN mkdir -p /app/Certificates
+COPY "PasswordKeeper.Server/CertGen/AspNetApp.pfx" /app/Certificates
+
 ENTRYPOINT ["dotnet", "PasswordKeeper.Server.dll"]
