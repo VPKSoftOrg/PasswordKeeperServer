@@ -29,4 +29,13 @@ public class DatabaseTests
         _ = await context.Users.CountAsync();
         // TODO::More tests
     }
+
+    /// <summary>
+    /// Tests the database down migration.
+    /// </summary>
+    [Test]
+    public void MigrateDown()
+    {
+        Program.Main([$"-t {nameof(DatabaseTests)}", "-d",]);
+    }
 }

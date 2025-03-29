@@ -9,7 +9,7 @@ namespace PasswordKeeper.Server.Controllers;
 public class AliveController : ControllerBase
 {
     /// <summary>
-    /// Gets the current date and time.S
+    /// Gets the current date and time.
     /// </summary>
     /// <returns>The current date and time.</returns>
     [Route("")]

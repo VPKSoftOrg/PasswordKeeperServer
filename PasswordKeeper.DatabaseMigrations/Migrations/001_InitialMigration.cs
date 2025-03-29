@@ -31,27 +31,32 @@ public class InitialMigration : Migration
 
         this.Create.Table(nameof(Collection)).InSchemaIf(Program.DatabaseName, !isSqlite)
             .WithColumn(nameof(Collection.Id)).AsInt64().NotNullable().PrimaryKey().Identity()
-            .WithColumn(nameof(Collection.Name)).AsString(255).NotNullable().Unique();
+            .WithColumn(nameof(Collection.Name)).AsString(255).NotNullable().Unique()
+            .WithColumn(nameof(Collection.ChallengeKeyHash)).AsString(1000).Nullable()
+            .WithColumn(nameof(Collection.ChallengeKeySalt)).AsString(1000).Nullable();
 
         this.Create.Table(nameof(CollectionSettings)).InSchemaIf(Program.DatabaseName, !isSqlite)
             .WithColumn(nameof(CollectionSettings.Id)).AsInt64().NotNullable().PrimaryKey().Identity()
             .WithColumn(nameof(CollectionSettings.JsonSettings)).AsString(int.MaxValue)
             .WithColumn(nameof(CollectionSettings.CollectionId)).AsInt64().NotNullable()
             .ForeignKey(nameof(Collection), nameof(Collection.Id));
-
-        this.Create.Table(nameof(UserCollectionSettings)).InSchemaIf(Program.DatabaseName, !isSqlite)
-            .WithColumn(nameof(UserCollectionSettings.Id)).AsInt64().NotNullable().PrimaryKey().Identity()
-            .WithColumn(nameof(UserCollectionSettings.JsonSettings)).AsString(int.MaxValue)
-            .WithColumn(nameof(UserCollectionSettings.CollectionId)).AsInt64().NotNullable()
+        
+        this.Create.Table(nameof(CollectionItem)).InSchemaIf(Program.DatabaseName, !isSqlite)
+            .WithColumn(nameof(CollectionItem.Id)).AsInt64().NotNullable().PrimaryKey().Identity()
+            .WithColumn(nameof(CollectionItem.CollectionId)).AsInt64().NotNullable()
             .ForeignKey(nameof(Collection), nameof(Collection.Id))
-            .WithColumn(nameof(UserCollectionSettings.UserId)).AsInt64().NotNullable()
-            .ForeignKey(nameof(User), nameof(User.Id));
+            .WithColumn(nameof(CollectionItem.ItemData)).AsString(int.MaxValue).NotNullable();
     }
 
     /// <inheritdoc cref="MigrationBase.Down" />
     public override void Down()
     {
-        this.Delete.Table(nameof(KeyData)).InSchema(Program.DatabaseName);
-        this.Delete.Table(nameof(User)).InSchema(Program.DatabaseName);
+        var isSqlite = Program.IsTestDb;
+        
+        this.Delete.Table(nameof(KeyData)).InSchemaIf(Program.DatabaseName, !isSqlite);
+        this.Delete.Table(nameof(CollectionSettings)).InSchemaIf(Program.DatabaseName, !isSqlite);
+        this.Delete.Table(nameof(CollectionItem)).InSchemaIf(Program.DatabaseName, !isSqlite);
+        this.Delete.Table(nameof(Collection)).InSchemaIf(Program.DatabaseName, !isSqlite);
+        this.Delete.Table(nameof(User)).InSchemaIf(Program.DatabaseName, !isSqlite);
     }
 }

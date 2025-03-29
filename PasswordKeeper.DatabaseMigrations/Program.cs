@@ -41,6 +41,12 @@ public class Program
     /// </summary>
     [Option(template: "-m|--makeDatabase", Description = "Create the database")]
     public bool MakeDatabase { get; } = false;
+
+    /// <summary>
+    /// A flag to indicate whether to run the down migrations.
+    /// </summary>
+    [Option(template: "-d|--down", Description = "Run the down migrations")]
+    public bool IsDownMigration { get; }
     
     /// <summary>
     /// The entry point for the application.
@@ -104,7 +110,7 @@ public class Program
         using var serviceProvider = IsTestDb ? CreateTestServices(connectionString) : CreateServices(connectionString);
         using var scope = serviceProvider.CreateScope();
 
-        UpdateDatabase(scope.ServiceProvider);
+        UpdateDatabase(scope.ServiceProvider, !IsDownMigration);
     }
 
     internal static bool IsTestDb;
@@ -151,13 +157,20 @@ public class Program
     /// <summary>
     /// Update the database
     /// </summary>
-    private static void UpdateDatabase(IServiceProvider serviceProvider)
+    private static void UpdateDatabase(IServiceProvider serviceProvider, bool up)
     {
         // Instantiate the runner
         var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
         // Execute the migrations
-        runner.MigrateUp();
+        if (up)
+        {
+            runner.MigrateUp();
+        }
+        else
+        {
+            runner.MigrateDown(0);
+        }
     }    
     
     /// <summary>
