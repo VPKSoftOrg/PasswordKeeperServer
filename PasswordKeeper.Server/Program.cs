@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -60,6 +59,22 @@ public static class Program
         _connectionString =
             builder.Configuration.GetValue<string>("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+        var migrateEnabled = builder.Configuration.GetValue<bool>("Migrate:Enabled");
+        var createDatabase = builder.Configuration.GetValue<bool>("Migrate:CreateDatabase");
+
+        // Run database migrations, if enabled
+        if (migrateEnabled)
+        {
+            if (createDatabase)
+            {
+                PasswordKeeper.DatabaseMigrations.Program.Main(["-c", _connectionString, "-m",]);
+            }
+            else
+            {
+                PasswordKeeper.DatabaseMigrations.Program.Main(["-c", _connectionString,]);
+            }
+        }
         
         // Add the database context
         builder.Services.AddDbContextFactory<Entities>(options => options.UseMySQL(_connectionString));

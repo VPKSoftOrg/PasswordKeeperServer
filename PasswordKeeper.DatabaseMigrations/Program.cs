@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using FluentMigrator.Runner;
-using Microsoft.Extensions.DependencyInjection;
 using McMaster.Extensions.CommandLineUtils;
+using Microsoft.Extensions.DependencyInjection;
 using PasswordKeeper.Classes;
 
 // ReSharper disable MemberCanBePrivate.Global
@@ -35,8 +35,13 @@ public class Program
     /// </summary>
     [Option(template: "-c|--connection", Description = "Use the test database")]
     public string ConnectionString { get; } = string.Empty;
-
-
+    
+    /// <summary>
+    /// A flag to indicate whether to create the database if it doesn't exist.
+    /// </summary>
+    [Option(template: "-m|--makeDatabase", Description = "Create the database")]
+    public bool MakeDatabase { get; } = false;
+    
     /// <summary>
     /// The entry point for the application.
     /// </summary>
@@ -61,8 +66,6 @@ public class Program
             IsTestDb = false;
             connectionString = ConnectionString;
 
-            Console.WriteLine(connectionString);
-
             // Replace the database name to sys, that should always exist in a MariaDB server
             var connectionStringMaster = Regex.Replace(connectionString, "Database=.*?(;|$)", "database=sys;");
 
@@ -79,16 +82,23 @@ public class Program
                 connectionString = Regex.Replace(connectionString, "Database=.*?(;|$)", $"Database={DatabaseName}$1");
             }
 
-            // Create the database, this is done before the migrations are run
-            using var connection = new MySql.Data.MySqlClient.MySqlConnection(connectionStringMaster);
-            connection.Open();
+            // Extract the database name from the connection string
+            DatabaseName = Regex.Match(connectionString, "Database=.*?(;|$)").Value.Replace("Database=", "")
+                .Replace(";", "");
 
-            using var command = connection.CreateCommand();
+            if (MakeDatabase)
+            {
+                // Create the database, this is done before the migrations are run
+                using var connection = new MySql.Data.MySqlClient.MySqlConnection(connectionStringMaster);
+                connection.Open();
 
-            command.CommandText = $"CREATE DATABASE IF NOT EXISTS {DatabaseName}";
-            command.ExecuteNonQuery();
+                using var command = connection.CreateCommand();
 
-            connection.Close();
+                command.CommandText = $"CREATE DATABASE IF NOT EXISTS {DatabaseName}";
+                command.ExecuteNonQuery();
+
+                connection.Close();
+            }
         }
 
         using var serviceProvider = IsTestDb ? CreateTestServices(connectionString) : CreateServices(connectionString);
@@ -153,5 +163,5 @@ public class Program
     /// <summary>
     /// The name of the database.
     /// </summary>
-    public const string DatabaseName = "password_keeper";
+    public static string DatabaseName { get; set; } = "password_keeper";
 }
