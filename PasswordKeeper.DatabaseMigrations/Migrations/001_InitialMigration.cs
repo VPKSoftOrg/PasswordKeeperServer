@@ -46,6 +46,13 @@ public class InitialMigration : Migration
             .WithColumn(nameof(CollectionItem.CollectionId)).AsInt64().NotNullable()
             .ForeignKey(nameof(Collection), nameof(Collection.Id))
             .WithColumn(nameof(CollectionItem.ItemData)).AsString(int.MaxValue).NotNullable();
+        
+        this.Create.Table(nameof(UserCollectionMember)).InSchemaIf(Program.DatabaseName, !isSqlite)
+            .WithColumn(nameof(UserCollectionMember.Id)).AsInt64().NotNullable().PrimaryKey().Identity()
+            .WithColumn(nameof(UserCollectionMember.CollectionId)).AsInt64().NotNullable()
+            .ForeignKey(nameof(Collection), nameof(Collection.Id))
+            .WithColumn(nameof(UserCollectionMember.UserId)).AsInt64().NotNullable()
+            .ForeignKey(nameof(User), nameof(User.Id));
     }
 
     /// <inheritdoc cref="MigrationBase.Down" />
@@ -56,6 +63,7 @@ public class InitialMigration : Migration
         this.Delete.Table(nameof(KeyData)).InSchemaIf(Program.DatabaseName, !isSqlite);
         this.Delete.Table(nameof(CollectionSettings)).InSchemaIf(Program.DatabaseName, !isSqlite);
         this.Delete.Table(nameof(CollectionItem)).InSchemaIf(Program.DatabaseName, !isSqlite);
+        this.Delete.Table(nameof(UserCollectionMember)).InSchemaIf(Program.DatabaseName, !isSqlite);
         this.Delete.Table(nameof(Collection)).InSchemaIf(Program.DatabaseName, !isSqlite);
         this.Delete.Table(nameof(User)).InSchemaIf(Program.DatabaseName, !isSqlite);
     }

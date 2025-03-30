@@ -22,5 +22,6 @@ public class CollectionSettings : ICollectionSettings
     /// <summary>
     /// The <c>Collection</c> this <c>CollectionSettings</c> is associated with.
     /// </summary>
+    [ForeignKey(nameof(CollectionId))]
     public Collection? Collection { get; set; }
 }

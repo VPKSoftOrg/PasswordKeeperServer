@@ -36,43 +36,13 @@ public class Entities : DbContext
     /// </summary>
     public DbSet<KeyData> KeyData { get; init; } = null!;
     
-    /// <inheritdoc cref="DbContext.OnModelCreating" />
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<KeyData>().HasKey(f => f.Id);
-        
-        modelBuilder.Entity<User>(f =>
-        {
-            f.HasKey(k => k.Id);
-        });
-
-        modelBuilder.Entity<Collection>(f =>
-        {
-            f.HasKey(k => k.Id);
-            // Configure one-to-many relationship to CollectionItem
-            f.HasMany(k => k.CollectionItems)
-                .WithOne(ci => ci.Collection)
-                .HasForeignKey(ci => ci.CollectionId);
-            
-            // Configure one-to-one relationship to CollectionSettings
-            f.HasOne(k => k.CollectionSettings)
-                .WithOne(cs => cs.Collection)
-                .HasForeignKey<CollectionSettings>(cs => cs.CollectionId);
-        });
-        
-        modelBuilder.Entity<CollectionSettings>(f =>
-        {
-            f.HasKey(k => k.Id);
-            // Configure one-to-one relationship to Collection
-            f.HasOne(k => k.Collection)
-                .WithOne(c => c.CollectionSettings)
-                .HasForeignKey<CollectionSettings>(k => k.CollectionId);
-        });
-
-        modelBuilder.Entity<CollectionItem>(f =>
-        {
-            f.HasKey(k => k.Id);
-        });
-    }
+    /// <summary>
+    /// The <c>CollectionItem</c> database table.
+    /// </summary>
+    public DbSet<CollectionItem> CollectionItems { get; init; } = null!;
+    
+    /// <summary>
+    /// The <c>UserCollectionMember</c> database table.
+    /// </summary>
+    public DbSet<UserCollectionMember> UserCollectionMembers { get; init; } = null!;
 }

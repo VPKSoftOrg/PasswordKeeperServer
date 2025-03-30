@@ -29,7 +29,16 @@ public class DatabaseTests
         _ = await context.Users.CountAsync();
         // TODO::More tests
     }
-
+    
+    /// <summary>
+    /// Tests the database up migration.
+    /// </summary>
+    [Test]
+    public void MigrateUp()
+    {
+        // This is all that is needed as the Setup method runs the up migration
+    }
+    
     /// <summary>
     /// Tests the database down migration.
     /// </summary>
