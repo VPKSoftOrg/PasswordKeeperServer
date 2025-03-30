@@ -18,6 +18,11 @@ public class UserCollectionMember : IHasId, IHasUserId, IHasCollectionId
     public long CollectionId { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the collection is the default for the user.
+    /// </summary> 
+    public bool IsDefaultForUser { get; set; }
+
+    /// <summary>
     /// Gets or sets the collection.
     /// </summary>
     [ForeignKey(nameof(CollectionId))]

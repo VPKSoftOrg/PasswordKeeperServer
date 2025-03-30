@@ -14,7 +14,7 @@ public static class DiExtension
     /// <returns>The <paramref name="services"/> with the added services.</returns>
     public static IServiceCollection AddBusinessLogic(this IServiceCollection services)
     {
-        services.AddSingleton<Users>();
+        services.AddSingleton<UsersBusinessLogic>();
 
         return services;
     }

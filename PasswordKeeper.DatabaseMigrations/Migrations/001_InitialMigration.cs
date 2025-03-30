@@ -50,6 +50,7 @@ public class InitialMigration : Migration
         this.Create.Table(nameof(UserCollectionMember)).InSchemaIf(Program.DatabaseName, !isSqlite)
             .WithColumn(nameof(UserCollectionMember.Id)).AsInt64().NotNullable().PrimaryKey().Identity()
             .WithColumn(nameof(UserCollectionMember.CollectionId)).AsInt64().NotNullable()
+            .WithColumn(nameof(UserCollectionMember.IsDefaultForUser)).AsBoolean().NotNullable()
             .ForeignKey(nameof(Collection), nameof(Collection.Id))
             .WithColumn(nameof(UserCollectionMember.UserId)).AsInt64().NotNullable()
             .ForeignKey(nameof(User), nameof(User.Id));

@@ -12,7 +12,7 @@ namespace PasswordKeeper.Server.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController(Users users) : ControllerBase
+public class UsersController(UsersBusinessLogic usersBusinessLogic) : ControllerBase
 {
     /// <summary>
     /// User change data.
@@ -36,9 +36,9 @@ public class UsersController(Users users) : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateUser([FromBody] UserChangeRequest user)
     {
-        var loggedUser = await users.GetUserById(this.GetLoggedUserId());
+        var loggedUser = await usersBusinessLogic.GetUserById(this.GetLoggedUserId());
         
-        if (await users.GetUserByName(user.Username) is not null)
+        if (await usersBusinessLogic.GetUserByName(user.Username) is not null)
         {
             return BadRequest(Passwords.UserAlreadyExists);
         }
@@ -70,9 +70,9 @@ public class UsersController(Users users) : ControllerBase
             };
         
             var salt = string.IsNullOrEmpty(userDto.PasswordSalt) ? null : Convert.FromBase64String(userDto.PasswordSalt);
-            userDto.PasswordHash = Users.HashPassword(user.Password, ref salt);
+            userDto.PasswordHash = UsersBusinessLogic.HashPassword(user.Password, ref salt);
             userDto.PasswordSalt = Convert.ToBase64String(salt!);
-            var result = await users.UpsertUser(userDto);
+            var result = await usersBusinessLogic.UpsertUser(userDto);
         
             return result is null ? BadRequest() : Ok(result);
         }
@@ -92,7 +92,7 @@ public class UsersController(Users users) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> UpdateUserPassword([FromBody] UserChangeRequest user)
     {
-        var userDto = await users.GetUserById(user.UserId);
+        var userDto = await usersBusinessLogic.GetUserById(user.UserId);
         
         if (userDto is null)
         {
@@ -110,9 +110,9 @@ public class UsersController(Users users) : ControllerBase
         }
         
         var salt = Convert.FromBase64String(userDto.PasswordSalt);
-        userDto.PasswordHash = Users.HashPassword(user.Password, ref salt);
+        userDto.PasswordHash = UsersBusinessLogic.HashPassword(user.Password, ref salt);
         userDto.PasswordSalt = Convert.ToBase64String(salt!);
-        var result = await users.UpsertUser(userDto);
+        var result = await usersBusinessLogic.UpsertUser(userDto);
         
         return result is null ? BadRequest() : Ok(result);
     }
@@ -127,7 +127,7 @@ public class UsersController(Users users) : ControllerBase
     /// </returns>
     public async Task<IActionResult> UpdateUserName([FromBody] UserChangeRequest user)
     {
-        var userDto = await users.GetUserById(user.UserId);
+        var userDto = await usersBusinessLogic.GetUserById(user.UserId);
 
         if (userDto is null)
         {
@@ -146,7 +146,7 @@ public class UsersController(Users users) : ControllerBase
         
         userDto.Username = user.Username;
         userDto.UserFullName = user.UserFullName;
-        var result = await users.UpsertUser(userDto);
+        var result = await usersBusinessLogic.UpsertUser(userDto);
         
         return result is null ? BadRequest() : Ok(result);
     }
@@ -160,7 +160,7 @@ public class UsersController(Users users) : ControllerBase
     [HttpDelete]
     public async Task<IActionResult> DeleteUser(int userId)
     {
-        var userDto = await users.GetUserById(userId);
+        var userDto = await usersBusinessLogic.GetUserById(userId);
         
         if (userDto is null)
         {
@@ -168,7 +168,7 @@ public class UsersController(Users users) : ControllerBase
         }
         
         var loggedUserId = this.GetLoggedUserId();
-        var isLoggedUserAdmin = await users.GetUserById(loggedUserId) is { IsAdmin: true };
+        var isLoggedUserAdmin = await usersBusinessLogic.GetUserById(loggedUserId) is { IsAdmin: true };
         
         // Only admins can delete users and admins cannot delete themselves
         if (!isLoggedUserAdmin || loggedUserId == userId)
@@ -176,7 +176,7 @@ public class UsersController(Users users) : ControllerBase
             return Unauthorized();
         }
         
-        await users.DeleteUser(userId);
+        await usersBusinessLogic.DeleteUser(userId);
         
         return Ok();
     }
@@ -191,7 +191,7 @@ public class UsersController(Users users) : ControllerBase
     public async Task<IEnumerable<UserDto>> GetAllUsers()
     {
         
-        return await users.GetAllUsers();
+        return await usersBusinessLogic.GetAllUsers();
     }
     
     /// <summary>

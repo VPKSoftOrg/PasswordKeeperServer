@@ -10,7 +10,7 @@ namespace PasswordKeeper.DataAccess;
 /// </summary>
 /// <param name="dbContextFactory">The <c>Entities</c> database context factory.</param>
 /// <param name="mapper">An instance to a class implementing the <see cref="IMapper"/> interface.</param>
-public class Users(IDbContextFactory<Entities> dbContextFactory, IMapper mapper)
+public class UsersDataAccess(IDbContextFactory<Entities> dbContextFactory, IMapper mapper)
 {
     /// <summary>
     /// Gets the user with the given name, or null if no such user exists.

@@ -32,8 +32,8 @@ public class PasswordHashTests
         for (var i = 0; i < 10; i++)
         {
             var testPassword = GenerateRandomString(random.Next(10, 30));
-            var hashed = Users.HashPassword(testPassword, ref salt);
-            result &= Users.VerifyPassword(testPassword, hashed, salt!);
+            var hashed = UsersBusinessLogic.HashPassword(testPassword, ref salt);
+            result &= UsersBusinessLogic.VerifyPassword(testPassword, hashed, salt!);
             if (!result)
             {
                 break;

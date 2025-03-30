@@ -9,7 +9,7 @@ namespace PasswordKeeper.Server.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class AuthenticationController(Users users) : ControllerBase
+public class AuthenticationController(UsersBusinessLogic usersBusinessLogic) : ControllerBase
 {
     /// <summary>
     /// User login data.
@@ -28,7 +28,7 @@ public class AuthenticationController(Users users) : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] UserLogin user)
     {
-        var result = await users.Login(user.Username, user.Password, Program.GetJwtKey(), Program.PseudoDomain);
+        var result = await usersBusinessLogic.Login(user.Username, user.Password, Program.GetJwtKey(), Program.PseudoDomain);
         
         if (result.Success)
         {

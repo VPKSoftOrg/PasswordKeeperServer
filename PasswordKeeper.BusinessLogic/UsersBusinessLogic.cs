@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using PasswordKeeper.Classes;
+using PasswordKeeper.DataAccess;
 using PasswordKeeper.DTO;
 using PasswordKeeper.Interfaces.Enumerations;
 
@@ -9,42 +10,42 @@ namespace PasswordKeeper.BusinessLogic;
 /// <summary>
 /// User business logic class.
 /// </summary>
-public class Users(PasswordKeeper.DataAccess.Users users)
+public class UsersBusinessLogic(PasswordKeeper.DataAccess.UsersDataAccess usersDataAccess)
 {
-    /// <inheritdoc cref="PasswordKeeper.DataAccess.Users.UpsertUser"/>
+    /// <inheritdoc cref="UsersDataAccess.UpsertUser"/>
     public async Task<UserDto?> UpsertUser(UserDto userDto)
     {
-        return await users.UpsertUser(userDto);
+        return await usersDataAccess.UpsertUser(userDto);
     }
     
-    /// <inheritdoc cref="PasswordKeeper.DataAccess.Users.GetUserByName"/>
+    /// <inheritdoc cref="UsersDataAccess.GetUserByName"/>
     public async Task<UserDto?> GetUserByName(string name)
     {
-        return await users.GetUserByName(name);
+        return await usersDataAccess.GetUserByName(name);
     }
     
-    /// <inheritdoc cref="PasswordKeeper.DataAccess.Users.GetUserById"/>
+    /// <inheritdoc cref="UsersDataAccess.GetUserById"/>
     public async Task<UserDto?> GetUserById(long id)
     {
-        return await users.GetUserById(id);
+        return await usersDataAccess.GetUserById(id);
     }
 
-    /// <inheritdoc cref="PasswordKeeper.DataAccess.Users.UsersExist"/>    
+    /// <inheritdoc cref="UsersDataAccess.UsersExist"/>    
     public async Task<bool> UsersExist(bool? admin = null)
     {
-        return await users.UsersExist(admin);
+        return await usersDataAccess.UsersExist(admin);
     }
 
-    /// <inheritdoc cref="PasswordKeeper.DataAccess.Users.GetAllUsers"/>
+    /// <inheritdoc cref="UsersDataAccess.GetAllUsers"/>
     public async Task<IEnumerable<UserDto>> GetAllUsers()
     {
-        return await users.GetAllUsers();
+        return await usersDataAccess.GetAllUsers();
     }
     
-    /// <inheritdoc cref="PasswordKeeper.DataAccess.Users.DeleteUser"/>
+    /// <inheritdoc cref="UsersDataAccess.DeleteUser"/>
     public async Task DeleteUser(long id)
     {
-        await users.DeleteUser(id);
+        await usersDataAccess.DeleteUser(id);
     }
     
     private const int IterationCount = 1000000;
@@ -106,7 +107,7 @@ public class Users(PasswordKeeper.DataAccess.Users users)
     /// <returns>A JWT token if the login is valid, otherwise an error message.</returns>
     public async Task<LoginResult> Login(string username, string password, byte[] jwtKey, string pseudoDomain)
     {
-        var adminExists = await users.UsersExist(true);
+        var adminExists = await usersDataAccess.UsersExist(true);
         UserDto? userDto = null;
 
         if (username.Length < 4)
@@ -132,7 +133,7 @@ public class Users(PasswordKeeper.DataAccess.Users users)
                 UserFullName = "Administrator",
             };
 
-            userDto = await users.UpsertUser(userDto);
+            userDto = await usersDataAccess.UpsertUser(userDto);
 
             if (userDto is null)
             {
@@ -144,13 +145,13 @@ public class Users(PasswordKeeper.DataAccess.Users users)
         }
         else
         {
-            userDto = await users.GetUserByName(username);
+            userDto = await usersDataAccess.GetUserByName(username);
         }
 
         // An existing user, verify the password
         if (userDto is not null)
         {
-            if (Users.VerifyPassword(password, userDto.PasswordHash,
+            if (UsersBusinessLogic.VerifyPassword(password, userDto.PasswordHash,
                     Convert.FromBase64String(userDto.PasswordSalt)))
             {
                 var token = Passwords.GenerateJwtToken(username, userDto.Id, jwtKey, pseudoDomain, userDto.IsAdmin);

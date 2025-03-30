@@ -33,8 +33,8 @@ public class ControllerTests
     public async Task AuthenticationControllerLoginTest()
     {
         var dbContextFactory = Helpers.GetMockDbContextFactory(nameof(ControllerTests));
-        var dataAccess = new PasswordKeeper.DataAccess.Users(dbContextFactory, Helpers.CreateMapper());
-        var businessLogic = new PasswordKeeper.BusinessLogic.Users(dataAccess);
+        var dataAccess = new PasswordKeeper.DataAccess.UsersDataAccess(dbContextFactory, Helpers.CreateMapper());
+        var businessLogic = new PasswordKeeper.BusinessLogic.UsersBusinessLogic(dataAccess);
         var controller = new AuthenticationController(businessLogic);
         var loginData = new AuthenticationController.UserLogin("firsUserIsAdmin", "password");
         var result = await controller.Login(loginData);
@@ -58,8 +58,8 @@ public class ControllerTests
     public async Task ControllerCreateUserTest()
     {
         var dbContextFactory = Helpers.GetMockDbContextFactory(nameof(ControllerTests));
-        var dataAccess = new PasswordKeeper.DataAccess.Users(dbContextFactory, Helpers.CreateMapper());
-        var businessLogic = new PasswordKeeper.BusinessLogic.Users(dataAccess);
+        var dataAccess = new PasswordKeeper.DataAccess.UsersDataAccess(dbContextFactory, Helpers.CreateMapper());
+        var businessLogic = new PasswordKeeper.BusinessLogic.UsersBusinessLogic(dataAccess);
         var authenticationController = new AuthenticationController(businessLogic);
         var usersController = new UsersController(businessLogic);
         var loginData = new AuthenticationController.UserLogin("firsUserIsAdmin", "Pa1sword%");
