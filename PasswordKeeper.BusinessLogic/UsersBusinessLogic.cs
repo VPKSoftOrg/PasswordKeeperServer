@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using PasswordKeeper.Classes;
+﻿using PasswordKeeper.Classes;
 using PasswordKeeper.DataAccess;
 using PasswordKeeper.DTO;
 using PasswordKeeper.Interfaces.Enumerations;
@@ -58,18 +56,8 @@ public class UsersBusinessLogic(PasswordKeeper.DataAccess.UsersDataAccess usersD
     /// <returns>The hashed password as a base-64 encoded string.</returns>
     public static string HashPassword(string password, ref byte[]? salt)
     {
-        if (salt == null)
-        {
-            RandomNumberGenerator.Create().GetBytes(salt = new byte[32]);    
-        }
-        
-        var hash = KeyDerivation.Pbkdf2(
-            password: password,
-            salt: salt,
-            prf: KeyDerivationPrf.HMACSHA512,
-            iterationCount: IterationCount,
-            numBytesRequested: 64);
-        return Convert.ToBase64String(hash);
+        var hash = KeyUtilities.HashKey(password, IterationCount, ref salt);
+        return hash;
     }
 
     /// <summary>

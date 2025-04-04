@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using PasswordKeeper.Interfaces;
 
 namespace PasswordKeeper.DAO;
@@ -6,6 +7,7 @@ namespace PasswordKeeper.DAO;
 /// <summary>
 /// A DAO for the <c>Collection</c> database table.
 /// </summary>
+[Table(nameof(Collection))]
 public class Collection : ICollection, IKeyHashMembers
 {
     /// <inheritdoc cref="IHasId.Id" />

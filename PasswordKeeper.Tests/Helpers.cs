@@ -2,6 +2,8 @@
 using AutoMapper;
 using PasswordKeeper.DAO;
 using PasswordKeeper.DataAccess;
+using PasswordKeeper.DatabaseMigrations;
+using PasswordKeeper.Tests.Extensions;
 
 namespace PasswordKeeper.Tests;
 
@@ -61,5 +63,19 @@ public static class Helpers
         }
 
         return _jwtKey;
+    }
+
+    /// <summary>
+    /// Sets up the test environment before each test.
+    /// </summary>
+    /// <param name="testClassName">The name of the test class.</param>
+    /// <returns>A Task representing the asynchronous operation.</returns>
+    public static async Task<IDisposableContextFactory<Entities>> MakeBasicTestSetup(string testClassName)
+    {
+        Helpers.DeleteDatabase(testClassName);
+        Program.Main([$"-t {testClassName}",]);
+        var dbContextFactory = Helpers.GetMockDbContextFactory(testClassName);
+        await dbContextFactory.PopulateDatabase();
+        return dbContextFactory;
     }
 }

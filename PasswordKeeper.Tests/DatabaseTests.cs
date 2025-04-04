@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PasswordKeeper.DAO;
-using PasswordKeeper.DataAccess;
 using PasswordKeeper.DatabaseMigrations;
-using PasswordKeeper.DTO;
 
 namespace PasswordKeeper.Tests;
 
@@ -17,10 +15,7 @@ public class DatabaseTests
     [SetUp]
     public async Task Setup()
     {
-        Helpers.DeleteDatabase(nameof(DatabaseTests));
-        Program.Main([$"-t {nameof(DatabaseTests)}",]);
-        DbContextFactory = Helpers.GetMockDbContextFactory(nameof(DatabaseTests));
-        await PopulateDatabase();
+        DbContextFactory = await Helpers.MakeBasicTestSetup(nameof(DatabaseTests));
     }
 
     /// <summary>
@@ -36,27 +31,6 @@ public class DatabaseTests
     /// Gets the mock database context factory.
     /// </summary>
     private IDisposableContextFactory<Entities> DbContextFactory { get; set; } = null!;
-    
-    private async Task PopulateDatabase()
-    {
-        var dbContextFactory = DbContextFactory;
-        var dataAccess = new PasswordKeeper.DataAccess.UsersDataAccess(dbContextFactory, Helpers.CreateMapper());
-        var businessLogic = new PasswordKeeper.BusinessLogic.UsersBusinessLogic(dataAccess);
-
-        byte[]? salt = null;
-        var password = "Pa1sword%";
-
-        var user = new UserDto
-        {
-            Username = "Admin",
-            PasswordHash =  PasswordKeeper.BusinessLogic.UsersBusinessLogic.HashPassword(password, ref salt),
-            PasswordSalt = Convert.ToBase64String(salt!),
-            IsAdmin = false,
-            UserFullName = "Administrator",
-        };
-
-        await businessLogic.UpsertUser(user);
-    }
     
     /// <summary>
     /// Tests the database creation via migration and entity framework core.

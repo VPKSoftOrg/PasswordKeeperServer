@@ -6,6 +6,7 @@ namespace PasswordKeeper.DAO;
 /// <summary>
 /// A DAO for the <c>UserCollectionMember</c> database table.
 /// </summary>
+[Table(nameof(UserCollectionMember))]
 public class UserCollectionMember : IHasId, IHasUserId, IHasCollectionId
 {
     /// <inheritdoc cref="IHasId.Id"/>
